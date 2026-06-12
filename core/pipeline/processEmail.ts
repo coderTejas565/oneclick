@@ -1,32 +1,30 @@
-import { corsair } from "@/corsair";
-import { normalizeEmail } from "../email/normalize";
-import { classifyEmail } from "../ai/classifyEmail";
+import { fetchEmails } from "@/services/gmail.service";
+import { normalizeEmail } from "@/core/email/normalize";
+import { classifyEmail } from "@/core/ai/classifyEmail";
 
-export async function processEmail(emailId: string) {
-  try {
-    const email = await corsair.gmail.api.messages.get({
-      id: emailId,
+export async function processEmails() {
+  const emails = await fetchEmails();
+
+  const results = [];
+
+  for (const email of emails) {
+    const normalized = normalizeEmail(email);
+
+    const emailText = `
+Subject: ${normalized.subject}
+From: ${normalized.from}
+To: ${normalized.to}
+Snippet: ${normalized.snippet}
+Body: ${normalized.body}
+    `.trim();
+
+    const classified = await classifyEmail(emailText);
+
+    results.push({
+      ...normalized,
+      classification: classified,
     });
-
-    if (!email) {
-      throw new Error("Email not found");
-    }
-
-    const cleanEmail = normalizeEmail(email);
-
-    const aiResult = await classifyEmail(cleanEmail);
-
-    return {
-      success: true,
-      email: cleanEmail,
-      analysis: aiResult,
-    };
-  } catch (error) {
-    console.error("processEmail error:", error);
-
-    return {
-      success: false,
-      error: String(error),
-    };
   }
+
+  return results;
 }
