@@ -1,43 +1,33 @@
 "use client";
 
-import { useState } from "react";
-import Sidebar from "@/components/Sidebar";
-import EmailList from "@/components/EmailList";
-import { mockEmails } from "@/lib/mockEmails";
+import { useEffect, useState } from "react";
 
 export default function Page() {
-  const [selectedEmail, setSelectedEmail] = useState(mockEmails[0]);
+  const [emails, setEmails] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function load() {
+      const res = await fetch("/api/gmail-live");
+      const data = await res.json();
+
+      if (data.success) {
+        setEmails(data.messages || []);
+      }
+    }
+
+    load();
+  }, []);
 
   return (
-    <div className="flex h-screen">
-      {/* LEFT */}
-      <Sidebar />
+    <div style={{ padding: 20 }}>
+      <h1>Inbox</h1>
 
-      {/* MIDDLE */}
-      <EmailList
-        emails={mockEmails}
-        selectedEmail={selectedEmail}
-        onSelectEmail={setSelectedEmail}
-      />
-
-      {/* RIGHT */}
-      <div className="w-1/3 border-l p-4">
-        {selectedEmail ? (
-          <>
-            <h2 className="font-bold text-lg">
-              {selectedEmail.subject}
-            </h2>
-            <p className="text-sm text-gray-500 mt-1">
-              {selectedEmail.from}
-            </p>
-            <p className="mt-4 text-gray-700">
-              {selectedEmail.body}
-            </p>
-          </>
-        ) : (
-          <p className="text-gray-400">Select an email</p>
-        )}
-      </div>
+      {emails.map((email) => (
+        <div key={email.id} style={{ marginBottom: 10 }}>
+          <div><b>ID:</b> {email.id}</div>
+          <div><b>Thread:</b> {email.threadId}</div>
+        </div>
+      ))}
     </div>
   );
 }
