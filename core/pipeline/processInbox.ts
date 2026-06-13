@@ -3,7 +3,7 @@ import { processEmail } from "./processEmail";
 
 export async function processInbox() {
   const result = await corsair.gmail.api.messages.list({
-    maxResults: 2,
+    maxResults: 1,
   });
 
   const messages = result.messages ?? [];

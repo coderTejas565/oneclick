@@ -2,6 +2,7 @@ import { corsair } from "@/corsair";
 import { getEmailById } from "../email/getEmailById";
 import { normalizeEmail } from "../email/normalize";
 import { classifyEmail } from "../ai/classifyEmail";
+import { cleanEmail } from "../email/cleanEmail";
 
 export async function processEmail(emailId: string) {
   try {
@@ -13,10 +14,11 @@ export async function processEmail(emailId: string) {
 
     const normalized = normalizeEmail(rawEmail);
 
+    normalized.body = cleanEmail(normalized.body);
+
     if (!normalized?.body && !normalized?.subject) {
       throw new Error("Invalid normalized email");
     }
-
 
     const analysis = await classifyEmail(normalized);
 
