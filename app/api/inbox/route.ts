@@ -1,14 +1,20 @@
 import { NextResponse } from "next/server";
 import { processInbox } from "@/core/pipeline/processInbox";
+import { groupEmails } from "@/core/inbox/groupEmails";
+import { formatInboxResponse } from "@/core/inbox/formatInboxResponse";
 
 export async function GET() {
   try {
     const emails = await processInbox();
 
+    const grouped = groupEmails(emails);
+
+    const response = formatInboxResponse(grouped)
+
+
     return NextResponse.json({
       success: true,
-      count: emails.length,
-      emails,
+       ...response
     });
   } catch (error) {
     return NextResponse.json(
