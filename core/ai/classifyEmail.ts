@@ -1,20 +1,22 @@
 import { GoogleGenAI } from "@google/genai";
-import dotenv from "dotenv";
-import { EMAIL_CLASSIFICATION_PROMPT } from "./prompt";
-
-dotenv.config();
+import { emailPrompt } from "./prompt";
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY!,
 });
 
-export async function classifyEmail(emailText: string) {
-  const prompt = EMAIL_CLASSIFICATION_PROMPT(emailText);
+export async function classifyEmail(email: any) {
+  const prompt = emailPrompt(email.body);
 
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
     contents: prompt,
   });
+const text = response.text;
 
-  return JSON.parse(response.text || "{}");
+if (!text) {
+  throw new Error("Empty AI response");
+}
+
+return JSON.parse(text);
 }

@@ -1,30 +1,45 @@
-import { fetchEmails } from "@/services/gmail.service";
-import { normalizeEmail } from "@/core/email/normalize";
-import { classifyEmail } from "@/core/ai/classifyEmail";
+import { corsair } from "@/corsair";
+import { getEmailById } from "../email/getEmailById";
+import { normalizeEmail } from "../email/normalize";
+import { classifyEmail } from "../ai/classifyEmail";
 
-export async function processEmails() {
-  const emails = await fetchEmails();
+export async function processEmail(emailId: string) {
+  try {
+    const rawEmail = await getEmailById(emailId);
 
-  const results = [];
+    if (!rawEmail) {
+      throw new Error("Email not found");
+    }
 
-  for (const email of emails) {
-    const normalized = normalizeEmail(email);
+    const normalized = normalizeEmail(rawEmail);
 
-    const emailText = `
-Subject: ${normalized.subject}
-From: ${normalized.from}
-To: ${normalized.to}
-Snippet: ${normalized.snippet}
-Body: ${normalized.body}
-    `.trim();
+    if (!normalized?.body && !normalized?.subject) {
+      throw new Error("Invalid normalized email");
+    }
 
-    const classified = await classifyEmail(emailText);
 
-    results.push({
-      ...normalized,
-      classification: classified,
-    });
+    const analysis = await classifyEmail(normalized);
+
+    if (!analysis) {
+      throw new Error("AI classification failed");
+    }
+
+    const result = {
+      email: normalized,
+      analysis,
+      meta: {
+        processedAt: new Date().toISOString(),
+        emailId,
+      },
+    };
+
+    return result;
+
+  } catch (error) {
+    console.error("processEmail error:", error);
+
+    throw new Error(
+      "Failed to process email: " + (error as Error).message
+    );
   }
-
-  return results;
 }
