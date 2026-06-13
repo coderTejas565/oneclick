@@ -5,18 +5,34 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY!,
 });
 
-export async function classifyEmail(email: any) {
-  const prompt = emailPrompt(email.body);
+export async function classifyEmail(email: {
+  subject?: string;
+  body?: string;
+}) {
+  try {
+    const prompt = emailPrompt(
+      email.subject ?? "",
+      email.body ?? ""
+    );
 
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: prompt,
-  });
-const text = response.text;
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+    });
 
-if (!text) {
-  throw new Error("Empty AI response");
-}
+    const text = response.text;
 
-return JSON.parse(text);
+    if (!text) {
+      throw new Error("Empty AI response");
+    }
+
+    return JSON.parse(text);
+
+  } catch (error) {
+    console.error("classifyEmail error:", error);
+
+    throw new Error(
+      "Failed to classify email"
+    );
+  }
 }

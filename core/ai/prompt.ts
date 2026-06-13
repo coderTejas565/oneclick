@@ -1,146 +1,145 @@
-export const emailPrompt = (email: string) => `
+export const emailPrompt = (
+subject: string,
+body: string
+) => `
 You are an AI email analysis engine.
 
-Your task is to analyze an email and return a structured JSON response.
+Your job is to understand an email and return structured JSON.
 
-EMAIL:
+SUBJECT:
+${subject}
 
-${email}
+BODY:
+${body}
 
--------------------------
+---
 
-VALID CATEGORIES (choose exactly one):
+Classify the email into exactly one category:
 
-- Hiring
-- Fundraising
-- Customer
-- Partnership
-- Finance
-- Newsletter
-- Personal
-- Other
+* Hiring
+* Fundraising
+* Customer
+* Partnership
+* Finance
+* Newsletter
+* Personal
+* Other
 
--------------------------
+---
 
-VALID PRIORITIES (choose exactly one):
+Assign exactly one priority:
 
-- High
-- Medium
-- Low
+* High
+* Medium
+* Low
 
--------------------------
-
-VALID ACTION TYPES:
-
-- schedule_meeting
-- reply_email
-- create_reminder
-- review_document
-- pay_invoice
-- none
-
--------------------------
-
-CLASSIFICATION RULES
-
-Hiring:
-- interviews
-- recruiters
-- job opportunities
-
-Fundraising:
-- investors
-- VCs
-- fundraising discussions
-
-Customer:
-- demos
-- sales conversations
-- support requests
-- customer communication
-
-Partnership:
-- collaborations
-- integrations
-- business opportunities
-
-Finance:
-- invoices
-- payments
-- billing
-
-Newsletter:
-- marketing emails
-- product updates
-- educational newsletters
-- promotional content
-
-Personal:
-- personal communication
-
-Other:
-- anything else
-
--------------------------
-
-PRIORITY RULES
+Priority Guidelines:
 
 High:
-- investor opportunities
-- interviews
-- customer issues
-- payment deadlines
-- urgent business actions
+
+* Interviews
+* Investors
+* Customer issues
+* Payment deadlines
+* Time-sensitive business requests
 
 Medium:
-- follow ups
-- normal business discussions
+
+* Follow ups
+* Business conversations
+* Collaboration discussions
 
 Low:
-- newsletters
-- promotions
-- informational content
 
--------------------------
+* Newsletters
+* Promotions
+* Product updates
+* Educational content
 
-OUTPUT JSON SCHEMA
+---
+
+Determine whether the user must take action.
+
+actionRequired:
+
+true  = recipient must do something
+false = informational only
+
+---
+
+Valid action types:
+
+* schedule_meeting
+* reply_email
+* create_reminder
+* review_document
+* pay_invoice
+* none
+
+---
+
+ACTION EXTRACTION RULES
+
+Only create actions when the email explicitly requires action.
+
+Do NOT create actions for:
+
+* marketing links
+* unsubscribe links
+* download app links
+* social media links
+* promotional buttons
+* informational newsletters
+
+Newsletter emails should usually return:
+
+"actionRequired": false
+
+and
 
 {
-  "summary": "",
-  "category": "",
-  "priority": "",
-  "actionRequired": true,
-  "actions": [
-    {
-      "type": "",
-      "title": "",
-      "details": ""
-    }
-  ],
-  "participants": [],
-  "suggestedActions": [],
-  "confidence": 0.0
+"type": "none"
 }
 
--------------------------
+unless the email contains a genuine task or deadline.
 
-IMPORTANT RULES
+---
 
-- Return ONLY valid JSON
-- No markdown
-- No code fences
-- No explanations
-- No extra text
-- Summary must be under 2 sentences
-- Confidence must be between 0 and 1
-- Category must be one of the allowed categories
-- Priority must be one of the allowed priorities
-- If no action is required:
-  {
-    "type": "none",
-    "title": "No action required",
-    "details": ""
-  }
+Return STRICT JSON:
 
-Return JSON now.
+{
+"summary": "",
+"category": "",
+"priority": "",
+"actionRequired": true,
+"actions": [
+{
+"type": "",
+"title": "",
+"details": ""
+}
+],
+"participants": [],
+"suggestedActions": [],
+"confidence": 0.0
+}
+
+---
+
+Rules:
+
+* Return ONLY JSON
+* No markdown
+* No explanations
+* Summary max 2 sentences
+* Confidence between 0 and 1
+* If no action exists, return exactly one action:
+
+{
+"type": "none",
+"title": "No action required",
+"details": ""
+}
+
+Generate JSON now.
 `;
