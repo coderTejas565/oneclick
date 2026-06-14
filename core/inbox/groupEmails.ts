@@ -1,3 +1,11 @@
+function sortByNewest(items: any[]) {
+  return items.sort(
+    (a, b) =>
+      Number(b.email.timestamp) -
+      Number(a.email.timestamp)
+  );
+}
+
 export function groupEmails(emails: any[]) {
   const safeEmails = (emails || []).filter(
     (e) => e?.email?.id && e?.analysis
@@ -11,9 +19,14 @@ export function groupEmails(emails: any[]) {
   };
 
   for (const item of safeEmails) {
-    const priority = item.analysis?.priority?.toLowerCase();
-    const category = item.analysis?.category?.toLowerCase();
-    const actionRequired = item.analysis?.actionRequired;
+    const priority =
+      item.analysis?.priority?.toLowerCase();
+
+    const category =
+      item.analysis?.category?.toLowerCase();
+
+    const actionRequired =
+      item.analysis?.actionRequired;
 
     if (actionRequired === true) {
       buckets.actionRequired.push(item);
@@ -33,5 +46,21 @@ export function groupEmails(emails: any[]) {
     buckets.others.push(item);
   }
 
-  return buckets;
+  return {
+    actionRequired: sortByNewest(
+      buckets.actionRequired
+    ),
+
+    highPriority: sortByNewest(
+      buckets.highPriority
+    ),
+
+    newsletter: sortByNewest(
+      buckets.newsletter
+    ),
+
+    others: sortByNewest(
+      buckets.others
+    ),
+  };
 }
