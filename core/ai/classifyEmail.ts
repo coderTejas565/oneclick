@@ -28,11 +28,24 @@ export async function classifyEmail(email: {
 
     return JSON.parse(text);
 
-  } catch (error) {
-    console.error("classifyEmail error:", error);
+  } catch (error: any) {
+  console.error("AI classify failed:", error.message);
 
-    throw new Error(
-      "Failed to classify email"
-    );
+    return {
+      summary: "AI analysis temporarily unavailable",
+      category: "Other",
+      priority: "Low",
+      actionRequired: false,
+      actions: [
+        {
+          type: "none",
+          title: "No action required",
+          details: "",
+        },
+      ],
+      participants: [],
+      suggestedActions: [],
+      confidence: 0,
+    };
   }
 }

@@ -14,7 +14,8 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-       ...response
+       ...response,
+        emails: emails ?? []
     });
   } catch (error) {
     return NextResponse.json(

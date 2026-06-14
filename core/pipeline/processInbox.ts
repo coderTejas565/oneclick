@@ -18,7 +18,11 @@ export async function processInbox() {
         message.id
       );
 
-      processedEmails.push(processed);
+    if (!processed?.email?.id) continue;
+
+    if (!processed?.analysis) continue;
+    
+    processedEmails.push(processed);
     } catch (error) {
       console.error(
         `Failed processing ${message.id}`,
