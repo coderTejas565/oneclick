@@ -1,3 +1,7 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+
 async function getEmail(id: string) {
   const res = await fetch(
     `http://localhost:3000/api/email/${id}`,
@@ -13,6 +17,19 @@ async function getEmail(id: string) {
   return res.json();
 }
 
+function getPriorityVariant(priority: string) {
+  switch (priority?.toLowerCase()) {
+    case "high":
+      return "destructive";
+
+    case "medium":
+      return "secondary";
+
+    default:
+      return "outline";
+  }
+}
+
 export default async function EmailPage({
   params,
 }: {
@@ -26,85 +43,136 @@ export default async function EmailPage({
   const analysis = data.email.analysis;
 
   return (
-    <main className="max-w-4xl mx-auto p-8">
-      {/* Subject */}
-      <h1 className="text-3xl font-bold mb-6">
-        {email.subject}
-      </h1>
+    <main className="max-w-4xl mx-auto p-8 space-y-6">
+      {/* Header */}
 
-      {/* Sender */}
-      <div className="mb-6 rounded-lg border p-4">
-        <p>
-          <span className="font-semibold">
-            From:
-          </span>{" "}
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">
+          {email.subject}
+        </h1>
+
+        <p className="text-sm text-muted-foreground mt-2">
           {email.from}
         </p>
-
-        <p>
-          <span className="font-semibold">
-            To:
-          </span>{" "}
-          {email.to}
-        </p>
       </div>
+
+      {/* Email Meta */}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Email Details</CardTitle>
+        </CardHeader>
+
+        <CardContent className="space-y-3">
+          <div>
+            <p className="text-sm text-muted-foreground">
+              From
+            </p>
+
+            <p>{email.from}</p>
+          </div>
+
+          <div>
+            <p className="text-sm text-muted-foreground">
+              To
+            </p>
+
+            <p>{email.to}</p>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* AI Analysis */}
-      <div className="mb-6 rounded-lg border p-6">
-        <h2 className="text-xl font-semibold mb-4">
-          AI Summary
-        </h2>
 
-        <p className="mb-4">
-          {analysis.summary}
-        </p>
+      <Card>
+        <CardHeader>
+          <CardTitle>AI Analysis</CardTitle>
+        </CardHeader>
 
-        <div className="flex gap-3">
-          <span className="rounded-full border px-3 py-1 text-sm">
-            {analysis.category}
-          </span>
+        <CardContent>
+          <p className="leading-7 mb-5">
+            {analysis.summary}
+          </p>
 
-          <span className="rounded-full border px-3 py-1 text-sm">
-            {analysis.priority}
-          </span>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="outline">
+              {analysis.category}
+            </Badge>
 
-          {analysis.actionRequired && (
-            <span className="rounded-full border px-3 py-1 text-sm">
-              Action Required
-            </span>
-          )}
-        </div>
-      </div>
+            <Badge
+              variant={getPriorityVariant(
+                analysis.priority
+              ) as any}
+            >
+              {analysis.priority}
+            </Badge>
+
+            {analysis.actionRequired && (
+              <Badge variant="destructive">
+                Action Required
+              </Badge>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Actions */}
-      {analysis.actions?.length > 0 && (
-        <div className="mb-6 rounded-lg border p-6">
-          <h2 className="text-xl font-semibold mb-4">
-            Suggested Actions
-          </h2>
 
-          <ul className="space-y-2">
-            {analysis.actions.map(
-              (action: any, index: number) => (
-                <li key={index}>
-                  • {action.title}
-                </li>
-              )
-            )}
-          </ul>
-        </div>
-      )}
+      {analysis.actions?.length > 0 &&
+        analysis.actions[0]?.type !==
+          "none" && (
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                Suggested Actions
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent>
+              <ul className="space-y-3">
+                {analysis.actions.map(
+                  (
+                    action: any,
+                    index: number
+                  ) => (
+                    <li
+                      key={index}
+                      className="border rounded-lg p-3"
+                    >
+                      <p className="font-medium">
+                        {action.title}
+                      </p>
+
+                      {action.details && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {action.details}
+                        </p>
+                      )}
+                    </li>
+                  )
+                )}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
 
       {/* Original Email */}
-      <div className="rounded-lg border p-6">
-        <h2 className="text-xl font-semibold mb-4">
-          Original Email
-        </h2>
 
-        <p className="whitespace-pre-wrap leading-7">
-          {email.body}
-        </p>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            Original Email
+          </CardTitle>
+        </CardHeader>
+
+        <Separator />
+
+        <CardContent className="pt-6">
+          <div className="whitespace-pre-wrap leading-7 text-sm">
+            {email.body}
+          </div>
+        </CardContent>
+      </Card>
     </main>
   );
 }

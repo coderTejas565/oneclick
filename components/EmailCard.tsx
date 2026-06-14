@@ -1,5 +1,12 @@
 import Link from "next/link";
 
+import {
+  Card,
+  CardContent,
+} from "@/components/ui/card";
+
+import { Badge } from "@/components/ui/badge";
+
 type EmailCardProps = {
   id: string;
   subject: string;
@@ -19,39 +26,54 @@ export function EmailCard({
   priority,
   actionRequired,
 }: EmailCardProps) {
+  const getPriorityVariant = () => {
+    switch (priority.toLowerCase()) {
+      case "high":
+        return "destructive";
+
+      case "medium":
+        return "secondary";
+
+      default:
+        return "outline";
+    }
+  };
+
   return (
     <Link href={`/inbox/${id}`}>
-      <article className="border rounded-xl p-4 hover:bg-gray-50 transition cursor-pointer">
-        <div className="flex justify-between items-start gap-4">
-          <h3 className="font-semibold text-base">
-            {subject}
-          </h3>
+      <Card className="cursor-pointer transition hover:shadow-md hover:border-primary">
+        <CardContent className="p-4">
+          <div className="flex justify-between items-start gap-4">
+            <h3 className="font-semibold text-base line-clamp-2">
+              {subject}
+            </h3>
 
-          <span className="text-xs border rounded-full px-2 py-1 whitespace-nowrap">
-            {priority}
-          </span>
-        </div>
+            <Badge variant={getPriorityVariant()}>
+              {priority}
+            </Badge>
+          </div>
 
-        <p className="text-sm text-gray-600 mt-1">
-          {from}
-        </p>
+          <p className="text-sm text-muted-foreground mt-1">
+            {from}
+          </p>
 
-        <p className="text-sm text-gray-500 mt-3 line-clamp-2">
-          {summary}
-        </p>
+          <p className="text-sm text-muted-foreground mt-3 line-clamp-2">
+            {summary}
+          </p>
 
-        <div className="flex gap-2 mt-4">
-          <span className="text-xs border rounded-full px-2 py-1">
-            {category}
-          </span>
+          <div className="flex flex-wrap gap-2 mt-4">
+            <Badge variant="outline">
+              {category}
+            </Badge>
 
-          {actionRequired && (
-            <span className="text-xs border rounded-full px-2 py-1">
-              Action Required
-            </span>
-          )}
-        </div>
-      </article>
+            {actionRequired && (
+              <Badge variant="destructive">
+                Action Required
+              </Badge>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </Link>
   );
 }

@@ -1,3 +1,6 @@
+import { Card } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+
 type Email = {
   id: string;
   from: string;
@@ -16,26 +19,55 @@ export default function EmailList({
   onSelectEmail: (email: Email) => void;
 }) {
   return (
-    <div className="w-1/3 p-4 border-r space-y-2">
-      {emails.map((email) => {
-        const isSelected = selectedEmail?.id === email.id;
+    <div className="w-[380px] border-r">
+      <div className="p-4 border-b">
+        <h2 className="font-semibold text-lg">
+          Inbox
+        </h2>
 
-        return (
-          <div
-            key={email.id}
-            onClick={() => onSelectEmail(email)}
-            className={`p-3 rounded cursor-pointer border transition
-              ${
-                isSelected
-                  ? "bg-blue-100 border-blue-400"
-                  : "hover:bg-gray-100"
-              }`}
-          >
-            <p className="font-medium">{email.subject}</p>
-            <p className="text-xs text-gray-500">{email.from}</p>
-          </div>
-        );
-      })}
+        <p className="text-sm text-muted-foreground">
+          {emails.length} emails
+        </p>
+      </div>
+
+      <ScrollArea className="h-[calc(100vh-80px)]">
+        <div className="p-3 space-y-2">
+          {emails.map((email) => {
+            const isSelected =
+              selectedEmail?.id === email.id;
+
+            return (
+              <Card
+                key={email.id}
+                onClick={() => onSelectEmail(email)}
+                className={`
+                  cursor-pointer p-3 transition-all
+                  hover:shadow-sm
+                  ${
+                    isSelected
+                      ? "border-primary bg-muted"
+                      : ""
+                  }
+                `}
+              >
+                <div className="space-y-1">
+                  <h3 className="font-medium line-clamp-1">
+                    {email.subject}
+                  </h3>
+
+                  <p className="text-xs text-muted-foreground line-clamp-1">
+                    {email.from}
+                  </p>
+
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    {email.body}
+                  </p>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      </ScrollArea>
     </div>
   );
 }

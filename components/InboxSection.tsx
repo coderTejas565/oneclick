@@ -9,13 +9,20 @@ export function InboxSection({
   title,
   items,
 }: InboxSectionProps) {
-  if (!items.length) return null;
+  if (!items?.length) return null;
 
   return (
     <section className="mb-10">
-      <h2 className="text-lg font-semibold mb-4">
-        {title} ({items.length})
-      </h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold">
+          {title}
+        </h2>
+
+        <span className="text-sm text-muted-foreground">
+          {items.length} email
+          {items.length > 1 ? "s" : ""}
+        </span>
+      </div>
 
       <div className="space-y-3">
         {items.map((item) => (
