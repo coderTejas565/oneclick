@@ -1,6 +1,7 @@
 import { InboxSection } from "@/components/InboxSection";
 import { SyncStatusCard } from "@/components/sync-status-card";
 import { ActionDashboard } from "@/components/action-dashboard";
+import { ChatBox } from "@/components/chat/chat-box";
 
 import {
   Card,
@@ -33,6 +34,8 @@ export default async function InboxPage() {
           prioritization.
         </p>
       </div>
+
+      <ChatBox />
 
       <div className="mb-10">
         <SyncStatusCard />
