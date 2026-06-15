@@ -29,6 +29,16 @@ export const emails = pgTable("emails", {
   actionRequired: boolean(
     "action_required"
   ).default(false),
+  
+  replied: boolean("replied").default(false),
+
+  repliedAt: timestamp("replied_at", {
+    withTimezone: true,
+  }),
+
+  status: text("status").default("unread"),
+  
+  confidence: text("confidence"),
 
   processedAt: timestamp(
     "processed_at",

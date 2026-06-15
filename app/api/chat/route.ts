@@ -1,4 +1,10 @@
 import { NextResponse } from "next/server";
+import { db } from "@/db/db";
+import { emails } from "@/db/email-schema";
+import { eq, desc } from "drizzle-orm";
+
+import { generateReply } from "@/core/ai/generateReply";
+import { parseReply } from "@/core/ai/parseReply";
 
 type Intent =
   | "EMAIL_REPLY"
@@ -42,37 +48,81 @@ function detectIntent(message: string): Intent {
   return "UNKNOWN";
 }
 
+/**
+ * Finds best email to act on
+ */
+async function findTargetEmail(message: string) {
+  const text = message.toLowerCase();
+
+  if (text.includes("recruiter")) {
+    return db
+      .select()
+      .from(emails)
+      .where(eq(emails.category, "recruitment"))
+      .orderBy(desc(emails.processedAt))
+      .limit(1);
+  }
+
+  return db
+    .select()
+    .from(emails)
+    .where(eq(emails.actionRequired, true))
+    .orderBy(desc(emails.processedAt))
+    .limit(1);
+}
+
+/**
+ * Routes intent → real action
+ */
 async function routeIntent(
   intent: Intent,
   message: string
 ) {
   switch (intent) {
-    case "EMAIL_REPLY":
+    case "EMAIL_REPLY": {
+      const email =
+        (await findTargetEmail(message))?.[0];
+
+      if (!email) {
+        return {
+          type: "EMAIL_REPLY",
+          error: "No email found to reply to",
+        };
+      }
+
+      const rawDraft =
+        await generateReply(email);
+
+      const draft =
+        parseReply(rawDraft);
+
       return {
         type: "EMAIL_REPLY",
-        message:
-          "Reply flow triggered (next step: email selection + AI draft generation)",
+        email,
+        draft,
+        message: "Reply draft generated successfully",
       };
+    }
 
     case "EMAIL_SUMMARY":
       return {
         type: "EMAIL_SUMMARY",
         message:
-          "Summary flow triggered (next step: fetch email + AI summary)",
+          "Summary flow ready (next step: AI summarizer)",
       };
 
     case "SCHEDULE_MEETING":
       return {
         type: "SCHEDULE_MEETING",
         message:
-          "Calendar flow triggered (next step: Google Calendar integration)",
+          "Calendar flow ready (next step: Google Calendar integration)",
       };
 
     case "MARK_DONE":
       return {
         type: "MARK_DONE",
         message:
-          "Mark done flow triggered (next step: DB update)",
+          "Mark done flow ready (next step: DB update)",
       };
 
     default:
