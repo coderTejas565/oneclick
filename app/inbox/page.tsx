@@ -1,4 +1,5 @@
 import { InboxSection } from "@/components/InboxSection";
+import { SyncStatusCard } from "@/components/sync-status-card";
 
 import {
   Card,
@@ -31,6 +32,10 @@ export default async function InboxPage() {
           prioritization.
         </p>
       </div>
+
+      <div className="mb-10">
+  <SyncStatusCard />
+</div>
 
       {/* Stats Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">

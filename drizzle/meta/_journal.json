@@ -15,6 +15,13 @@
       "when": 1781417174179,
       "tag": "0001_wandering_clint_barton",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781503363380,
+      "tag": "0002_classy_supreme_intelligence",
+      "breakpoints": true
     }
   ]
 }

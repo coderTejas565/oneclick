@@ -1,28 +1,62 @@
 import { corsair } from "@/corsair";
 import { processEmail } from "../pipeline/processEmail";
 
+import {
+  ensureSyncState,
+  updateSyncState,
+} from "@/db/repositories/sync.repository";
+
 export async function syncInbox() {
-  const result = await corsair.gmail.api.messages.list({
-    maxResults: 10,
+  // Make sure sync_state row exists
+  await ensureSyncState();
+
+  await updateSyncState({
+    status: "running",
   });
 
-  const messages = result.messages ?? [];
+  try {
+    const result =
+      await corsair.gmail.api.messages.list({
+        maxResults: 20,
+      });
 
-  let processed = 0;
+    const messages =
+      result.messages ?? [];
 
-  for (const msg of messages) {
-    if (!msg.id) continue;
+    let processed = 0;
 
-    try {
-      await processEmail(msg.id);
-      processed++;
-    } catch (err) {
-      console.error("Sync failed for:", msg.id, err);
+    for (const msg of messages) {
+      if (!msg.id) continue;
+
+      try {
+        await processEmail(msg.id);
+        processed++;
+      } catch (err) {
+        console.error(
+          "Sync failed for:",
+          msg.id,
+          err
+        );
+      }
     }
-  }
 
-  return {
-    success: true,
-    processed,
-  };
+    await updateSyncState({
+      status: "idle",
+      lastSyncedAt: new Date(),
+      nextPageToken:
+        result.nextPageToken ?? null,
+    });
+
+    return {
+      success: true,
+      processed,
+    };
+  } catch (error) {
+    await updateSyncState({
+      status: "failed",
+      lastSyncedAt: new Date(),
+    });
+
+    throw error;
+  }
 }
