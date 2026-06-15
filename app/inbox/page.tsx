@@ -1,5 +1,6 @@
 import { InboxSection } from "@/components/InboxSection";
 import { SyncStatusCard } from "@/components/sync-status-card";
+import { ActionDashboard } from "@/components/action-dashboard";
 
 import {
   Card,
@@ -34,8 +35,12 @@ export default async function InboxPage() {
       </div>
 
       <div className="mb-10">
-  <SyncStatusCard />
-</div>
+        <SyncStatusCard />
+        </div>
+
+        <ActionDashboard
+  emails={inbox.actionRequired}
+/>
 
       {/* Stats Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
