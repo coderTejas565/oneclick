@@ -14,15 +14,12 @@ export async function processInbox() {
     if (!message.id) continue;
 
     try {
-      const processed = await processEmail(
-        message.id
-      );
+      const processed = await processEmail(message.id);
 
-    if (!processed?.email?.id) continue;
+      // DB row already contains everything needed
+      if (!processed?.id) continue;
 
-    if (!processed?.analysis) continue;
-    
-    processedEmails.push(processed);
+      processedEmails.push(processed);
     } catch (error) {
       console.error(
         `Failed processing ${message.id}`,

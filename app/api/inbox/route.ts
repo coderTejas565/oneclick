@@ -1,21 +1,23 @@
 import { NextResponse } from "next/server";
-import { processInbox } from "@/core/pipeline/processInbox";
+import { getAllEmails } from "@/db/repositories/email.repository";
 import { groupEmails } from "@/core/inbox/groupEmails";
 import { formatInboxResponse } from "@/core/inbox/formatInboxResponse";
 
 export async function GET() {
   try {
-    const emails = await processInbox();
+    const emails = await getAllEmails();
+    console.log("DB emails:", emails.length);
+
+
+console.log("RAW DB EMAILS:", emails[0]);
 
     const grouped = groupEmails(emails);
 
-    const response = formatInboxResponse(grouped)
-
+    const response = formatInboxResponse(grouped);
 
     return NextResponse.json({
       success: true,
-       ...response,
-        emails: emails ?? []
+      ...response,
     });
   } catch (error) {
     return NextResponse.json(

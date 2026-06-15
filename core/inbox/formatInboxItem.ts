@@ -1,20 +1,17 @@
 export function formatInboxItem(item: any) {
   return {
-    id: item.email.id,
+    id: item.id,
 
-    subject: item.email.subject,
+    subject: item.subject,
+    from: item.from,
 
-    from: item.email.from,
+    summary: item.summary,
 
-    summary: item.analysis.summary,
+    category: item.category,
+    priority: item.priority,
 
-    category: item.analysis.category,
+    actionRequired: item.actionRequired,
 
-    priority: item.analysis.priority,
-
-    actionRequired:
-      item.analysis.actionRequired,
-
-    timestamp: item.email.timestamp,
+    timestamp: item.processedAt,
   };
 }

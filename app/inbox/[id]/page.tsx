@@ -39,13 +39,11 @@ export default async function EmailPage({
 
   const data = await getEmail(id);
 
-  const email = data.email.email;
-  const analysis = data.email.analysis;
+  const email = data.email;
 
   return (
     <main className="max-w-4xl mx-auto p-8 space-y-6">
       {/* Header */}
-
       <div>
         <h1 className="text-3xl font-bold tracking-tight">
           {email.subject}
@@ -57,7 +55,6 @@ export default async function EmailPage({
       </div>
 
       {/* Email Meta */}
-
       <Card>
         <CardHeader>
           <CardTitle>Email Details</CardTitle>
@@ -83,7 +80,6 @@ export default async function EmailPage({
       </Card>
 
       {/* AI Analysis */}
-
       <Card>
         <CardHeader>
           <CardTitle>AI Analysis</CardTitle>
@@ -91,23 +87,25 @@ export default async function EmailPage({
 
         <CardContent>
           <p className="leading-7 mb-5">
-            {analysis.summary}
+            {email.summary}
           </p>
 
           <div className="flex flex-wrap gap-2">
             <Badge variant="outline">
-              {analysis.category}
+              {email.category}
             </Badge>
 
             <Badge
-              variant={getPriorityVariant(
-                analysis.priority
-              ) as any}
+              variant={
+                getPriorityVariant(
+                  email.priority
+                ) as any
+              }
             >
-              {analysis.priority}
+              {email.priority}
             </Badge>
 
-            {analysis.actionRequired && (
+            {email.actionRequired && (
               <Badge variant="destructive">
                 Action Required
               </Badge>
@@ -116,48 +114,7 @@ export default async function EmailPage({
         </CardContent>
       </Card>
 
-      {/* Actions */}
-
-      {analysis.actions?.length > 0 &&
-        analysis.actions[0]?.type !==
-          "none" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                Suggested Actions
-              </CardTitle>
-            </CardHeader>
-
-            <CardContent>
-              <ul className="space-y-3">
-                {analysis.actions.map(
-                  (
-                    action: any,
-                    index: number
-                  ) => (
-                    <li
-                      key={index}
-                      className="border rounded-lg p-3"
-                    >
-                      <p className="font-medium">
-                        {action.title}
-                      </p>
-
-                      {action.details && (
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {action.details}
-                        </p>
-                      )}
-                    </li>
-                  )
-                )}
-              </ul>
-            </CardContent>
-          </Card>
-        )}
-
       {/* Original Email */}
-
       <Card>
         <CardHeader>
           <CardTitle>
