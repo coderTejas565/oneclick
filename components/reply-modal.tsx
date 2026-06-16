@@ -27,16 +27,53 @@ export function ReplyModal({
 }: Props) {
   const router = useRouter();
 
-  const [subject, setSubject] = useState(
-    email?.draft?.subject || ""
-  );
-
-  const [body, setBody] = useState(
-    email?.draft?.body || ""
-  );
+  const [subject, setSubject] = useState("");
+  const [body, setBody] = useState("");
 
   const [loading, setLoading] = useState(false);
+  const [streaming, setStreaming] = useState(false);
 
+async function generateAIReply() {
+  setStreaming(true);
+  setBody("");
+  setSubject("");
+
+  try {
+    const res = await fetch(
+      "/api/email/draft",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          emailId: email.id,
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    console.log("Draft Response:", data);
+
+    if (!data.success) {
+      throw new Error(
+        "Failed to generate draft"
+      );
+    }
+
+    setSubject(data.draft.subject);
+
+    setBody(data.draft.body);
+  } catch (err) {
+    console.error(err);
+    alert("Failed to generate AI reply");
+  } finally {
+    setStreaming(false);
+  }
+}
+
+  // 📤 SEND EMAIL
   async function handleSend() {
     setLoading(true);
 
@@ -61,7 +98,6 @@ export function ReplyModal({
       }
 
       onOpenChange(false);
-
       router.refresh();
     } catch (err) {
       console.error(err);
@@ -76,7 +112,7 @@ export function ReplyModal({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>
-            ✉️ Reply to Email
+            ✉️ AI Reply Assistant
           </DialogTitle>
         </DialogHeader>
 
@@ -88,6 +124,7 @@ export function ReplyModal({
             </span>{" "}
             {email.from}
           </p>
+
           <p>
             <span className="font-medium">
               Original Subject:
@@ -96,8 +133,20 @@ export function ReplyModal({
           </p>
         </div>
 
+        {/* AI GENERATE BUTTON */}
+        <div className="pt-2">
+          <Button
+            onClick={generateAIReply}
+            disabled={streaming || loading}
+          >
+            {streaming
+              ? "Generating reply..."
+              : "✨ Generate AI Reply"}
+          </Button>
+        </div>
+
         {/* SUBJECT */}
-        <div className="space-y-2">
+        <div className="space-y-2 pt-4">
           <label className="text-sm font-medium">
             Subject
           </label>
@@ -107,6 +156,7 @@ export function ReplyModal({
             onChange={(e) =>
               setSubject(e.target.value)
             }
+            disabled={streaming}
           />
         </div>
 
@@ -122,6 +172,7 @@ export function ReplyModal({
             onChange={(e) =>
               setBody(e.target.value)
             }
+            disabled={streaming}
           />
         </div>
 
@@ -138,7 +189,7 @@ export function ReplyModal({
 
           <Button
             onClick={handleSend}
-            disabled={loading}
+            disabled={loading || streaming}
           >
             {loading
               ? "Sending..."

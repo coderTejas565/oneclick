@@ -2,28 +2,39 @@ import { generateText } from "@/core/ai/client";
 
 export async function generateReply(email: any) {
   const prompt = `
-You are an AI assistant writing email replies.
+You are an AI email assistant.
 
-EMAIL:
+Write a professional email reply to the email below.
+
+Original Email:
+
 From: ${email.from}
+
 Subject: ${email.subject}
-Body: ${email.body}
 
-Write a short professional reply.
+Body:
+${email.body}
 
-FORMAT STRICTLY:
-SUBJECT:
-<subject>
-
-BODY:
-<body>
+Requirements:
+- Be concise
+- Be professional
+- Respond directly to the sender's request
+- Do NOT generate a subject line
+- Return ONLY the email body text
 `;
 
   const result = await generateText(prompt);
 
   if (!result) {
-    throw new Error("AI failed to generate reply");
+    throw new Error(
+      "AI failed to generate reply"
+    );
   }
 
-  return result;
+  console.log(
+    "Generated Reply:",
+    result
+  );
+
+  return result.trim();
 }

@@ -22,6 +22,17 @@ type Email = {
   priority: string | null;
 };
 
+function getPriorityColor(priority: string | null) {
+  switch (priority?.toLowerCase()) {
+    case "high":
+      return "destructive";
+    case "medium":
+      return "secondary";
+    default:
+      return "outline";
+  }
+}
+
 export function ActionDashboard({
   emails,
 }: {
@@ -29,77 +40,97 @@ export function ActionDashboard({
 }) {
   const [selectedEmail, setSelectedEmail] = useState<any>(null);
   const [open, setOpen] = useState(false);
+  const [openingId, setOpeningId] = useState<string | null>(null);
+
+  function handleReply(email: Email) {
+    setOpeningId(email.id);
+
+    // small UX delay makes it feel “thinking”
+    setTimeout(() => {
+      setSelectedEmail(email);
+      setOpen(true);
+      setOpeningId(null);
+    }, 150);
+  }
 
   return (
     <>
-      <Card>
+      <Card className="border-muted">
         <CardHeader>
-          <CardTitle>⚡ Action Center</CardTitle>
+          <CardTitle className="text-xl">
+            ⚡ Action Center
+          </CardTitle>
         </CardHeader>
 
         <CardContent>
           <div className="space-y-4">
             {emails.length === 0 ? (
-              <p className="text-muted-foreground">
-                No actions required 🎉
-              </p>
+              <div className="text-center py-8 text-muted-foreground">
+                🎉 No actions required
+              </div>
             ) : (
-              emails.map((email) => (
-                <div
-                  key={email.id}
-                  className="border rounded-lg p-4 space-y-3 hover:bg-muted/50 transition"
-                >
-                  {/* Header */}
-                  <div className="flex items-start justify-between gap-4">
-                    <h3 className="font-medium">
-                      {email.subject}
-                    </h3>
+              emails.map((email) => {
+                const isOpening = openingId === email.id;
 
-                    <Badge>
-                      {email.priority}
-                    </Badge>
-                  </div>
+                return (
+                  <div
+                    key={email.id}
+                    className="border rounded-xl p-4 space-y-3 transition hover:shadow-sm hover:border-muted-foreground/20 bg-card"
+                  >
+                    {/* HEADER */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="space-y-1">
+                        <h3 className="font-medium leading-snug">
+                          {email.subject || "No Subject"}
+                        </h3>
 
-                  {/* Summary */}
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {email.summary}
-                  </p>
+                        <p className="text-xs text-muted-foreground">
+                          Action required email
+                        </p>
+                      </div>
 
-                  {/* ACTIONS */}
-                  <div className="flex gap-2 pt-2">
-                    {/* 🔥 REAL ACTION */}
-                    <Button
-                      size="sm"
-                      onClick={() => {
-                        setSelectedEmail(email);
-                        setOpen(true);
-                      }}
-                    >
-                      Reply
-                    </Button>
+                      <Badge variant={getPriorityColor(email.priority)}>
+                        {email.priority || "low"}
+                      </Badge>
+                    </div>
 
-                    {/* Future feature */}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        alert("Schedule feature next step");
-                      }}
-                    >
-                      Schedule
-                    </Button>
+                    {/* SUMMARY */}
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {email.summary}
+                    </p>
 
-                    <Link href={`/inbox/${email.id}`}>
+                    {/* ACTIONS */}
+                    <div className="flex gap-2 pt-2">
+                      {/* MAIN ACTION */}
                       <Button
                         size="sm"
-                        variant="ghost"
+                        onClick={() => handleReply(email)}
+                        disabled={isOpening}
                       >
-                        View
+                        {isOpening ? "Thinking..." : "Reply"}
                       </Button>
-                    </Link>
+
+                      {/* SECONDARY */}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          alert("Schedule feature next step");
+                        }}
+                      >
+                        Schedule
+                      </Button>
+
+                      {/* VIEW */}
+                      <Link href={`/inbox/${email.id}`}>
+                        <Button size="sm" variant="ghost">
+                          View
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </CardContent>
@@ -110,7 +141,16 @@ export function ActionDashboard({
         <ReplyModal
           email={selectedEmail}
           open={open}
-          onOpenChange={setOpen}
+          onOpenChange={(val) => {
+            setOpen(val);
+
+            // reset state when closing
+            if (!val) {
+              setTimeout(() => {
+                setSelectedEmail(null);
+              }, 200);
+            }
+          }}
         />
       )}
     </>
