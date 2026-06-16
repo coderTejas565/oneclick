@@ -1,11 +1,5 @@
 import Link from "next/link";
-
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
-
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 
 type EmailCardProps = {
   id: string;
@@ -26,53 +20,54 @@ export function EmailCard({
   priority,
   actionRequired,
 }: EmailCardProps) {
-  const getPriorityVariant = () => {
-    switch (priority.toLowerCase()) {
-      case "high":
-        return "destructive";
-
-      case "medium":
-        return "secondary";
-
-      default:
-        return "outline";
-    }
-  };
-
   return (
     <Link href={`/inbox/${id}`}>
-      <Card className="cursor-pointer transition hover:shadow-md hover:border-primary">
-        <CardContent className="p-4">
-          <div className="flex justify-between items-start gap-4">
-            <h3 className="font-semibold text-base line-clamp-2">
-              {subject}
-            </h3>
+      <Card className="group relative rounded-xl border bg-card p-4 space-y-3 hover:shadow-sm transition-all cursor-pointer">
 
-            <Badge variant={getPriorityVariant()}>
-              {priority}
-            </Badge>
-          </div>
+        <h3 className="font-medium text-base leading-snug line-clamp-2">
+          {subject}
+        </h3>
 
-          <p className="text-sm text-muted-foreground mt-1">
-            {from}
+        <p className="text-xs text-muted-foreground">
+          {from}
+        </p>
+
+        <p className="text-sm text-muted-foreground line-clamp-2">
+          {summary}
+        </p>
+
+        <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
+          <span>{category}</span>
+
+          <span>•</span>
+
+          <span
+            className={
+              priority === "high"
+                ? "text-red-500 font-medium"
+                : priority === "medium"
+                ? "text-yellow-500"
+                : ""
+            }
+          >
+            {priority}
+          </span>
+
+          {actionRequired && (
+            <>
+              <span>•</span>
+              <span className="text-blue-500 font-medium">
+                Action
+              </span>
+            </>
+          )}
+        </div>
+
+        {actionRequired && (
+          <p className="text-[11px] text-muted-foreground mt-2 opacity-70">
+            AI: Suggested action available
           </p>
-
-          <p className="text-sm text-muted-foreground mt-3 line-clamp-2">
-            {summary}
-          </p>
-
-          <div className="flex flex-wrap gap-2 mt-4">
-            <Badge variant="outline">
-              {category}
-            </Badge>
-
-            {actionRequired && (
-              <Badge variant="destructive">
-                Action Required
-              </Badge>
-            )}
-          </div>
-        </CardContent>
+        )}
       </Card>
     </Link>
   );
