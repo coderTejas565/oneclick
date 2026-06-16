@@ -14,12 +14,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 import { ReplyModal } from "./reply-modal";
+import { ScheduleModal } from "./schedule-modal";
 
 type Email = {
   id: string;
   subject: string | null;
   summary: string | null;
   priority: string | null;
+
+  from?: string | null;
+  body?: string | null;
 };
 
 function getPriorityColor(priority: string | null) {
@@ -39,8 +43,11 @@ export function ActionDashboard({
   emails: Email[];
 }) {
   const [selectedEmail, setSelectedEmail] = useState<any>(null);
-  const [open, setOpen] = useState(false);
+  const [replyOpen, setReplyOpen] = useState(false);
+  const [scheduleOpen, setScheduleOpen] =
+  useState(false);
   const [openingId, setOpeningId] = useState<string | null>(null);
+
 
   function handleReply(email: Email) {
     setOpeningId(email.id);
@@ -48,10 +55,15 @@ export function ActionDashboard({
     // small UX delay makes it feel “thinking”
     setTimeout(() => {
       setSelectedEmail(email);
-      setOpen(true);
+      setReplyOpen(true);
       setOpeningId(null);
     }, 150);
   }
+
+  function handleSchedule(email: Email) {
+    setSelectedEmail(email);
+    setScheduleOpen(true);
+}
 
   return (
     <>
@@ -115,7 +127,7 @@ export function ActionDashboard({
                         size="sm"
                         variant="outline"
                         onClick={() => {
-                          alert("Schedule feature next step");
+                           handleSchedule(email)
                         }}
                       >
                         Schedule
@@ -140,9 +152,9 @@ export function ActionDashboard({
       {selectedEmail && (
         <ReplyModal
           email={selectedEmail}
-          open={open}
+          open={replyOpen}
           onOpenChange={(val) => {
-            setOpen(val);
+            setReplyOpen(val);
 
             // reset state when closing
             if (!val) {
@@ -153,6 +165,22 @@ export function ActionDashboard({
           }}
         />
       )}
-    </>
-  );
-}
+
+
+      {selectedEmail && (
+        <ScheduleModal
+        email={selectedEmail}
+        open={scheduleOpen}
+        onOpenChange={(val) => {
+            setScheduleOpen(val);
+            if (!val) {
+                setTimeout(() => {
+                    setSelectedEmail(null);
+                }, 200);
+            }
+        }}
+        />
+        )}
+        </>
+        );
+    }
