@@ -1,3 +1,5 @@
+import { EMAIL_STATUS } from "@/constants/email-status";
+
 function sortByNewest(items: any[]) {
   return items.sort(
     (a, b) =>
@@ -11,21 +13,28 @@ export function groupEmails(emails: any[]) {
     (e) => e?.id
   );
 
-  const buckets = {
-    actionRequired: [] as any[],
-    highPriority: [] as any[],
-    newsletter: [] as any[],
-    others: [] as any[],
-  };
+const buckets = {
+  actionRequired: [] as any[],
+  replied: [] as any[],
+  highPriority: [] as any[],
+  newsletter: [] as any[],
+  others: [] as any[],
+};
 
   for (const item of safeEmails) {
     const priority = item.priority?.toLowerCase();
     const category = item.category?.toLowerCase();
     const actionRequired = item.actionRequired;
+    const status = item.status?.toLowerCase();
+    
+    if (status ===  EMAIL_STATUS.PENDING) {
+        buckets.actionRequired.push(item);
+        continue;
+    }
 
-    if (actionRequired === true) {
-      buckets.actionRequired.push(item);
-      continue;
+    if (status === EMAIL_STATUS.REPLIED) {
+        buckets.actionRequired.push(item);
+        continue;
     }
 
     if (priority === "high") {
@@ -43,6 +52,7 @@ export function groupEmails(emails: any[]) {
 
   return {
     actionRequired: sortByNewest(buckets.actionRequired),
+    replied: sortByNewest(buckets.replied),
     highPriority: sortByNewest(buckets.highPriority),
     newsletter: sortByNewest(buckets.newsletter),
     others: sortByNewest(buckets.others),

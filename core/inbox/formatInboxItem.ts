@@ -12,6 +12,10 @@ export function formatInboxItem(item: any) {
 
     actionRequired: item.actionRequired,
 
+    status: item.status,
+
+    replied: item.replied,
+
     timestamp: item.processedAt,
   };
 }

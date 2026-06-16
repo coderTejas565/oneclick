@@ -4,6 +4,7 @@ import { emails } from "@/db/email-schema";
 import { eq } from "drizzle-orm";
 
 import { sendReply } from "@/core/email/sendReply";
+import { EMAIL_STATUS } from "@/constants/email-status";
 
 export async function POST(req: Request) {
   try {
@@ -36,10 +37,20 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           success: false,
-          error: "Email not found",
+          error: "Missing threadId",
         },
-        { status: 404 }
+        { status: 400 }
       );
+    }
+
+    if (email.replied) {
+        return NextResponse.json(
+            {
+                success: false,
+                error: "Email already replied",
+            },
+            { status: 400 }
+        );
     }
 
     // 2. Send reply via Gmail adapter
@@ -57,6 +68,7 @@ export async function POST(req: Request) {
       .set({
         replied: true,
         repliedAt: new Date(),
+        status: EMAIL_STATUS.REPLIED
       })
       .where(eq(emails.id, emailId));
 

@@ -2,6 +2,7 @@ import { corsair } from "@/corsair";
 import { normalizeEmail } from "../email/normalize";
 import { classifyEmail } from "../ai/classifyEmail";
 import { cleanEmail } from "../email/cleanEmail";
+import { EMAIL_STATUS } from "@/constants/email-status";
 
 import {
   getEmailById,
@@ -60,6 +61,8 @@ const savedEmail = await saveEmail({
   priority: analysis.priority,
   summary: analysis.summary,
   actionRequired: analysis.actionRequired,
+
+  status: analysis.actionRequired ? EMAIL_STATUS.PENDING : EMAIL_STATUS.DONE,
 });
 
     return savedEmail;

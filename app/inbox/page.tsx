@@ -41,16 +41,12 @@ export default async function InboxPage() {
         <SyncStatusCard />
         </div>
 
-        <ActionDashboard
-  emails={inbox.actionRequired}
-/>
-
       {/* Stats Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
         <Card>
           <CardContent className="p-4">
             <p className="text-sm text-muted-foreground">
-              Action Required
+              Pending
             </p>
 
             <p className="text-2xl font-bold">
@@ -62,11 +58,11 @@ export default async function InboxPage() {
         <Card>
           <CardContent className="p-4">
             <p className="text-sm text-muted-foreground">
-              High Priority
+              Replied
             </p>
 
             <p className="text-2xl font-bold">
-              {inbox.highPriority.length}
+              {inbox.replied?.length ?? 0}
             </p>
           </CardContent>
         </Card>
@@ -95,11 +91,15 @@ export default async function InboxPage() {
           </CardContent>
         </Card>
       </div>
+      
+      <ActionDashboard
+       emails={inbox.actionRequired}
+       />
 
       <InboxSection
-        title="⚡ Action Required"
-        items={inbox.actionRequired}
-      />
+         title="✅ Replied"
+          items={inbox.replied}
+        />
 
       <InboxSection
         title="🔥 High Priority"

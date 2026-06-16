@@ -9,8 +9,6 @@ export async function GET() {
     console.log("DB emails:", emails.length);
 
 
-console.log("RAW DB EMAILS:", emails[0]);
-
     const grouped = groupEmails(emails);
 
     const response = formatInboxResponse(grouped);
