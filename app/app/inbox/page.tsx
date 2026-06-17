@@ -35,8 +35,6 @@ export default async function InboxPage() {
         </p>
       </div>
 
-      <ChatBox />
-
       <div className="mb-10">
         <SyncStatusCard />
         </div>
