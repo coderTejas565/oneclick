@@ -1,33 +1,43 @@
-"use client";
+import Navbar from "@/components/landing/Navbar"
+import Hero from "@/components/landing/Hero"
+import Features from "@/components/landing/Features"
+import ProductDemo from "@/components/landing/ProductDemo"
+import Productivity from "@/components/landing/Productivity"
+import BentoGrid from "@/components/landing/BentoGrid"
+import Workflow from "@/components/landing/Workflow"
+import Security from "@/components/landing/Security"
+import Footer from "@/components/landing/Footer"
 
-import { useEffect, useState } from "react";
 
-export default function Page() {
-  const [emails, setEmails] = useState<any[]>([]);
 
-  useEffect(() => {
-    async function load() {
-      const res = await fetch("/api/gmail-live");
-      const data = await res.json();
+export default function Home(){
 
-      if (data.success) {
-        setEmails(data.messages || []);
-      }
-    }
 
-    load();
-  }, []);
+return (
 
-  return (
-    <div style={{ padding: 20 }}>
-      <h1>Inbox</h1>
+<main>
 
-      {emails.map((email) => (
-        <div key={email.id} style={{ marginBottom: 10 }}>
-          <div><b>ID:</b> {email.id}</div>
-          <div><b>Thread:</b> {email.threadId}</div>
-        </div>
-      ))}
-    </div>
-  );
+<Navbar />
+
+<Hero />
+
+<ProductDemo />
+
+<Features />
+
+<Productivity />
+
+<BentoGrid />
+
+<Workflow />
+
+<Security />
+
+<Footer />
+
+
+</main>
+
+)
+
 }
