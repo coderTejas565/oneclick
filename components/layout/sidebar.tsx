@@ -14,6 +14,7 @@ import {
   Zap,
 } from "lucide-react";
 
+
 const links = [
   {
     href: "/app",
@@ -37,157 +38,288 @@ const links = [
   },
 ];
 
+
 export function Sidebar() {
+
   const pathname = usePathname();
 
-  const [collapsed, setCollapsed] =
+
+  const [collapsed,setCollapsed] =
     useState(false);
 
-  useEffect(() => {
+
+
+  useEffect(()=>{
+
     const saved =
       localStorage.getItem(
         "oneclick-sidebar"
       );
 
-    if (saved) {
+
+    if(saved){
       setCollapsed(
         JSON.parse(saved)
       );
     }
-  }, []);
 
-  useEffect(() => {
+  },[]);
+
+
+
+  useEffect(()=>{
+
     localStorage.setItem(
       "oneclick-sidebar",
       JSON.stringify(collapsed)
     );
-  }, [collapsed]);
 
-  function toggleSidebar() {
-    setCollapsed((prev) => !prev);
+  },[collapsed]);
+
+
+
+
+  function toggleSidebar(){
+
+    setCollapsed(
+      prev=>!prev
+    );
+
   }
 
+
+
   return (
+
     <aside
-      className={`flex flex-col border-r bg-background transition-all duration-300 ${
+      className={`
+      hidden md:flex
+      flex-col
+      border-r
+      bg-background
+      transition-all
+      duration-300
+      ${
         collapsed
-          ? "w-16"
-          : "w-64"
-      }`}
+        ? "w-16"
+        : "w-64"
+      }
+      `}
     >
-      {/* HEADER */}
 
-      <div className="flex h-16 items-center border-b px-4">
 
-        {!collapsed ? (
-          <>
-            <div className="flex items-center gap-2">
 
-              <Zap className="h-5 w-5" />
+      {/* LOGO */}
 
-              <div>
-                <h2 className="font-semibold">
-                  OneClick
-                </h2>
+      <div
+        className="
+        flex
+        h-16
+        items-center
+        border-b
+        px-4
+        "
+      >
 
-                <p className="text-xs text-muted-foreground">
-                  AI Assistant
-                </p>
-              </div>
+
+        {!collapsed && (
+
+          <div
+            className="
+            flex
+            items-center
+            gap-2
+            "
+          >
+
+            <div
+              className="
+              flex
+              h-8
+              w-8
+              items-center
+              justify-center
+              rounded-lg
+              bg-primary
+              text-primary-foreground
+              "
+            >
+              <Zap className="h-4 w-4"/>
+            </div>
+
+
+            <div>
+
+              <h2 className="font-semibold">
+                OneClick
+              </h2>
+
+              <p className="text-xs text-muted-foreground">
+                AI Assistant
+              </p>
 
             </div>
 
-            <button
-              onClick={toggleSidebar}
-              className="ml-auto"
-            >
-              <PanelLeftClose className="h-4 w-4" />
-            </button>
-          </>
-        ) : (
-          <div className="flex w-full items-center justify-center">
-
-            <button
-              onClick={toggleSidebar}
-            >
-              <PanelLeftOpen className="h-4 w-4" />
-            </button>
-
           </div>
+
         )}
 
+
+
+        <button
+          onClick={toggleSidebar}
+          className="ml-auto text-muted-foreground hover:text-foreground"
+        >
+
+          {
+            collapsed
+            ?
+            <PanelLeftOpen className="h-4 w-4"/>
+            :
+            <PanelLeftClose className="h-4 w-4"/>
+          }
+
+        </button>
+
+
       </div>
+
+
+
+
 
       {/* NAV */}
 
-      <nav className="p-2">
+      <nav className="flex-1 p-3">
 
-        {links.map((link) => {
-          const Icon = link.icon;
 
-          const isActive =
-            pathname === link.href;
+        {links.map((link)=>{
+
+
+          const Icon =
+            link.icon;
+
+
+
+          const active =
+            link.href === "/app"
+            ? pathname === "/app"
+            : pathname.startsWith(link.href);
+
+
 
           return (
+
             <Link
               key={link.href}
               href={link.href}
-              title={collapsed
-                ? link.label
-                : undefined}
-              className={`mb-1 flex items-center rounded-lg py-2 text-sm transition-colors ${
+              title={
                 collapsed
-                  ? "justify-center px-0"
-                  : "gap-3 px-3"
-              } ${
-                isActive
-                  ? "bg-muted font-medium"
-                  : "hover:bg-muted"
-              }`}
-            >
-              <Icon className="h-4 w-4 shrink-0" />
+                ? link.label
+                : undefined
+              }
 
-              <span
-                className={`overflow-hidden whitespace-nowrap transition-all duration-300 ${
-                  collapsed
-                    ? "w-0 opacity-0"
-                    : "w-auto opacity-100"
-                }`}
-              >
-                {link.label}
-              </span>
+              className={`
+              mb-1
+              flex
+              items-center
+              rounded-lg
+              py-2
+              text-sm
+              transition
+
+              ${
+                collapsed
+                ?
+                "justify-center"
+                :
+                "gap-3 px-3"
+              }
+
+              ${
+                active
+                ?
+                "bg-primary/10 text-primary font-medium"
+                :
+                "hover:bg-muted"
+              }
+              `}
+            >
+
+
+              <Icon
+                className="
+                h-4
+                w-4
+                shrink-0
+                "
+              />
+
+
+
+              {!collapsed && (
+
+                <span>
+                  {link.label}
+                </span>
+
+              )}
+
 
             </Link>
+
           );
+
+
         })}
+
 
       </nav>
 
+
+
+
+
       {/* FOOTER */}
 
-      <div className="mt-auto p-3">
 
-        {!collapsed ? (
-          <div className="rounded-lg border p-3 text-xs text-muted-foreground">
+      <div className="p-3">
 
-            <div className="font-medium mb-1">
+
+        {!collapsed && (
+
+          <div
+            className="
+            rounded-xl
+            border
+            bg-muted/30
+            p-3
+            text-xs
+            text-muted-foreground
+            "
+          >
+
+            <p className="font-medium text-foreground mb-1">
               Quick Tip
-            </div>
+            </p>
 
-            Press ⌘K to open the
-            Command Center.
 
-          </div>
-        ) : (
-          <div className="flex justify-center">
+            Use AI assistant to
+            manage your inbox faster.
 
-            <Zap className="h-4 w-4 text-muted-foreground" />
 
           </div>
+
         )}
+
+
 
       </div>
 
+
     </aside>
+
+
   );
+
 }
