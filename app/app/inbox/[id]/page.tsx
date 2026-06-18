@@ -1,5 +1,3 @@
-
-
 import {
   Card,
   CardContent,
@@ -18,33 +16,43 @@ import {
 } from "@/components/ui/separator";
 
 import {
-  Reply,
-  Calendar,
   ArrowLeft,
   Sparkles,
   Clock,
 } from "lucide-react";
 
 import Link from "next/link";
+
 import { EmailActions } from "@/components/email-actions";
 
+import { redirect } from "next/navigation";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
 
-async function getEmail(id:string){
-
-const res =
-await fetch(
-`http://localhost:3000/api/email/${id}`,
-{
-cache:"no-store",
-}
-);
+import {
+  getEmailById
+} from "@/db/repositories/email.repository";
 
 
-if(!res.ok)
-throw new Error();
+
+async function getEmail(
+  userId:string,
+  id:string
+){
+
+  const email =
+    await getEmailById(
+      userId,
+      id
+    );
 
 
-return res.json();
+  if(!email){
+    throw new Error("Email not found");
+  }
+
+
+  return email;
 
 }
 
@@ -56,7 +64,7 @@ priority:string
 ){
 
 switch(
-priority?.toLowerCase()
+priority.toLowerCase()
 ){
 
 case "high":
@@ -88,15 +96,28 @@ params:Promise<{id:string}>
 }){
 
 
+const session =
+await auth.api.getSession({
+ headers: await headers()
+});
+
+
+if(!session){
+ redirect("/login");
+}
+
+
+
 const {id}=await params;
 
 
-const data =
-await getEmail(id);
-
 
 const email =
-data.email;
+await getEmail(
+ session.user.id,
+ id
+);
+
 
 
 
@@ -109,11 +130,6 @@ p-6
 space-y-6
 ">
 
-
-
-
-
-{/* TOP BAR */}
 
 
 <div className="
@@ -142,7 +158,6 @@ Inbox
 
 
 
-
 <EmailActions
 email={email}
 />
@@ -151,13 +166,6 @@ email={email}
 </div>
 
 
-
-
-
-
-
-
-{/* EMAIL HEADER */}
 
 
 
@@ -173,17 +181,14 @@ space-y-4
 
 <div>
 
-
 <h1 className="
 text-2xl
 font-semibold
-leading-tight
 ">
 
-{email.subject}
+{email.subject ?? "No Subject"}
 
 </h1>
-
 
 
 <p className="
@@ -210,29 +215,31 @@ flex-wrap
 ">
 
 
+
 <span
 className={`
 text-xs
 px-3
 py-1
 rounded-full
-${priorityStyle(email.priority)}
+${priorityStyle(email.priority ?? "low")}
 `}
 >
 
-{email.priority}
+{email.priority ?? "low"}
 
 </span>
 
 
 
-<Badge
-variant="outline"
->
 
-{email.category}
+
+<Badge variant="outline">
+
+{email.category ?? "Other"}
 
 </Badge>
+
 
 
 
@@ -240,9 +247,7 @@ variant="outline"
 {
 email.actionRequired && (
 
-<Badge
-variant="destructive"
->
+<Badge variant="destructive">
 
 Action Required
 
@@ -257,13 +262,9 @@ Action Required
 </div>
 
 
-
 </CardContent>
 
 </Card>
-
-
-
 
 
 
@@ -278,9 +279,6 @@ gap-6
 
 
 
-
-
-{/* EMAIL BODY */}
 
 
 
@@ -306,9 +304,7 @@ mb-4
 font-medium
 ">
 
-<Clock
-className="h-4"
-/>
+<Clock className="h-4"/>
 
 Email Content
 
@@ -316,9 +312,10 @@ Email Content
 
 
 
-<Separator
-className="mb-5"
-/>
+
+<Separator className="mb-5"/>
+
+
 
 
 
@@ -330,10 +327,9 @@ leading-7
 "
 >
 
-{email.body}
+{email.body ?? "No content available"}
 
 </div>
-
 
 
 </CardContent>
@@ -347,13 +343,8 @@ leading-7
 
 
 
-
-
-{/* AI PANEL */}
-
-
-
 <Card>
+
 
 <CardContent
 className="
@@ -363,7 +354,6 @@ space-y-5
 >
 
 
-
 <div className="
 flex
 items-center
@@ -371,13 +361,12 @@ gap-2
 font-medium
 ">
 
-<Sparkles
-className="h-4"
-/>
+<Sparkles className="h-4"/>
 
 AI Summary
 
 </div>
+
 
 
 
@@ -388,7 +377,7 @@ text-muted-foreground
 leading-6
 ">
 
-{email.summary}
+{email.summary ?? "No AI summary generated"}
 
 </p>
 
@@ -400,11 +389,6 @@ leading-6
 
 
 
-
-
-<div className="
-space-y-2
-">
 
 
 <p className="
@@ -423,13 +407,11 @@ email={email}
 />
 
 
-</div>
-
-
 
 
 
 </CardContent>
+
 
 </Card>
 
@@ -437,10 +419,7 @@ email={email}
 
 
 
-
 </div>
-
-
 
 
 

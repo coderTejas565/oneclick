@@ -16,26 +16,35 @@ import {
 } from "lucide-react";
 
 
+import { headers } from "next/headers";
+
 
 async function getInbox(){
 
 const res =
 await fetch(
-"http://localhost:3000/api/inbox",
+`${process.env.APP_URL}/api/inbox`,
 {
-cache:"no-store"
+  cache:"no-store",
+  headers:{
+    cookie:
+      (await headers())
+      .get("cookie") ?? ""
+  }
 }
 );
 
 
-if(!res.ok)
-throw new Error();
+if(!res.ok){
+  throw new Error(
+    "Failed to fetch inbox"
+  );
+}
 
 
 return res.json();
 
 }
-
 
 
 
@@ -52,30 +61,69 @@ return (
 <main className="
 max-w-6xl
 mx-auto
-p-5
-space-y-5
+p-6
+space-y-8
 ">
 
 
 
-{/* TOP BAR */}
+{/* HEADER */}
+
 
 <div className="
 flex
-gap-3
+items-center
+justify-between
+">
+
+
+<div>
+
+
+<h1 className="
+text-3xl
+font-bold
+flex
+gap-2
 items-center
 ">
 
+<Sparkles className="h-7 w-7"/>
 
-{/* SMALL COMMAND */}
+Command Center
 
-<Card className="
-flex-1
+</h1>
+
+
+<p className="
+text-muted-foreground
+mt-2
 ">
 
-<CardContent className="
-p-2
-">
+Your AI executive assistant for emails.
+
+</p>
+
+
+</div>
+
+
+
+<SyncStatusCard/>
+
+
+</div>
+
+
+
+
+
+{/* COMMAND BAR */}
+
+
+<Card className="border-muted">
+
+<CardContent className="p-3">
 
 <ChatBox/>
 
@@ -86,35 +134,17 @@ p-2
 
 
 
-{/* SYNC */}
-
-<div className="
-shrink-0
-">
-
-<SyncStatusCard/>
-
-</div>
 
 
-
-</div>
-
-
-
-
-
-
-{/* SMALL STATS */}
+{/* STATS */}
 
 
 <div className="
 grid
 grid-cols-2
 md:grid-cols-4
-gap-3
+gap-4
 ">
-
 
 
 <StatCard
@@ -128,7 +158,6 @@ inbox.actionRequired.length
 }
 
 />
-
 
 
 <StatCard
@@ -149,7 +178,7 @@ inbox.replied?.length ?? 0
 
 icon={<Mail/>}
 
-title="News"
+title="Newsletters"
 
 value={
 inbox.newsletter.length
@@ -180,7 +209,9 @@ inbox.highPriority.length
 
 
 
+
 {/* ACTION CENTER */}
+
 
 <ActionDashboard
 
@@ -195,14 +226,16 @@ inbox.actionRequired
 
 
 
-<div className="
-space-y-4
-">
+{/* EMAIL GROUPS */}
+
+
+
+<div className="space-y-6">
 
 
 <InboxSection
 
-title="🔥 Priority"
+title="🔥 High Priority"
 
 items={
 inbox.highPriority
@@ -224,15 +257,17 @@ inbox.replied
 
 
 
+
 <InboxSection
 
-title="📩 News"
+title="📩 Newsletters"
 
 items={
 inbox.newsletter
 }
 
 />
+
 
 
 
@@ -243,7 +278,6 @@ title="📬 Others"
 items={
 inbox.others
 }
-
 
 />
 
@@ -264,8 +298,6 @@ inbox.others
 
 
 
-
-
 function StatCard({
 icon,
 title,
@@ -278,7 +310,7 @@ return (
 <Card>
 
 <CardContent className="
-p-3
+p-5
 flex
 items-center
 justify-between
@@ -289,7 +321,7 @@ justify-between
 
 
 <p className="
-text-xs
+text-sm
 text-muted-foreground
 ">
 
@@ -298,10 +330,9 @@ text-muted-foreground
 </p>
 
 
-
 <p className="
-text-xl
-font-semibold
+text-3xl
+font-bold
 ">
 
 {value}
@@ -312,18 +343,12 @@ font-semibold
 </div>
 
 
-<div className="
-h-4
-w-4
-">
 
 {icon}
 
-</div>
-
-
 
 </CardContent>
+
 
 </Card>
 
