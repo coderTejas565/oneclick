@@ -4,32 +4,43 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
+ Dialog,
+ DialogContent,
+ DialogHeader,
+ DialogTitle,
 } from "@/components/ui/dialog";
 
 import {
-  Calendar,
-  Clock,
-  Sparkles,
-  Loader2,
-  CheckCircle,
-  AlertCircle,
+ Button
+} from "@/components/ui/button";
+
+import {
+ Input
+} from "@/components/ui/input";
+
+import {
+ Card,
+ CardContent
+} from "@/components/ui/card";
+
+
+import {
+ Calendar,
+ Sparkles,
+ Loader2,
+ CheckCircle,
+ Clock,
+ AlertCircle
 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 
 
 type Props = {
-  email:any;
-  open:boolean;
-  onOpenChange:(open:boolean)=>void;
+ email:any;
+ open:boolean;
+ onOpenChange:(open:boolean)=>void;
 };
+
 
 
 export function ScheduleModal({
@@ -38,99 +49,105 @@ export function ScheduleModal({
  onOpenChange
 }:Props){
 
-const router = useRouter();
+
+const router =
+useRouter();
+
 
 
 const [loading,setLoading]=useState(false);
-const [creating,setCreating]=useState(false);
 const [checking,setChecking]=useState(false);
+const [creating,setCreating]=useState(false);
+
+
 
 const [meeting,setMeeting]=useState<any>(null);
+
+const [slots,setSlots]=useState<any[]>([]);
+
+const [selected,setSelected]=useState<any>(null);
+
+
+const [date,setDate]=useState("");
 
 const [created,setCreated]=useState(false);
 
 const [error,setError]=useState("");
 
-const [date,setDate]=useState("");
-const [startTime,setStartTime]=useState("");
-const [endTime,setEndTime]=useState("");
 
-const [slots,setSlots]=useState<any[]>([]);
 
 
 
 useEffect(()=>{
 
- if(!open){
+if(!open){
 
-  setMeeting(null);
-  setCreated(false);
-  setError("");
+setMeeting(null);
+setSlots([]);
+setSelected(null);
+setCreated(false);
+setError("");
 
-  setDate("");
-  setStartTime("");
-  setEndTime("");
-
-  setSlots([]);
- }
+}
 
 },[open]);
 
 
 
 
+
+
+
 async function extractMeeting(){
+
 
 try{
 
 setLoading(true);
-setError("");
 
-const res = await fetch(
+
+const res =
+await fetch(
 "/api/calendar/extract",
 {
+
 method:"POST",
+
 headers:{
 "Content-Type":"application/json"
 },
+
 body:JSON.stringify({
 emailId:email.id
 })
+
 }
+
 );
 
 
-const data = await res.json();
+const data =
+await res.json();
 
 
-setMeeting(data.meeting);
+setMeeting(
+data.meeting
+);
 
 
-
-if(data.meeting?.date){
- setDate(data.meeting.date);
-}
-
-if(data.meeting?.startTime){
- setStartTime(data.meeting.startTime);
-}
-
-if(data.meeting?.endTime){
- setEndTime(data.meeting.endTime);
-}
+if(data.meeting?.date)
+setDate(data.meeting.date);
 
 
 
-}catch(err){
-
-console.error(err);
+}catch{
 
 setError(
-"Could not extract meeting details"
+"Could not analyze email"
 );
 
-
 }
+
 finally{
 
 setLoading(false);
@@ -144,11 +161,15 @@ setLoading(false);
 
 
 
-async function checkAvailability(){
+
+async function findSlots(){
+
 
 if(!date){
 
-setError("Select date first");
+setError(
+"Select date first"
+);
 
 return;
 
@@ -158,23 +179,31 @@ return;
 try{
 
 setChecking(true);
-setError("");
 
-const res = await fetch(
+
+const res =
+await fetch(
 "/api/calendar/availability",
 {
+
 method:"POST",
+
 headers:{
 "Content-Type":"application/json"
 },
+
 body:JSON.stringify({
 date
 })
+
 }
+
 );
 
 
-const data = await res.json();
+const data =
+await res.json();
+
 
 
 setSlots(
@@ -182,15 +211,11 @@ data.slots || []
 );
 
 
-
-}catch(err){
-
-console.error(err);
+}catch{
 
 setError(
-"Failed checking availability"
+"Failed finding slots"
 );
-
 
 }
 finally{
@@ -206,44 +231,32 @@ setChecking(false);
 
 
 
+
 async function createEvent(){
 
-if(!meeting)return;
+
+if(!selected)
+return;
 
 
 try{
 
 setCreating(true);
-setError("");
-
-
-if(
-!date ||
-!startTime ||
-!endTime
-){
-
-setError(
-"Please select date and time"
-);
-
-return;
-
-}
-
 
 
 const start =
 new Date(
-`${date}T${startTime}`
-).toISOString();
+`${date}T${selected.start}`
+)
+.toISOString();
 
 
 
 const end =
 new Date(
-`${date}T${endTime}`
-).toISOString();
+`${date}T${selected.end}`
+)
+.toISOString();
 
 
 
@@ -251,10 +264,13 @@ const res =
 await fetch(
 "/api/calendar/create",
 {
+
 method:"POST",
+
 headers:{
 "Content-Type":"application/json"
 },
+
 body:JSON.stringify({
 
 title:
@@ -262,12 +278,14 @@ meeting.title ||
 "Meeting",
 
 start,
+
 end
 
 })
-}
-);
 
+}
+
+);
 
 
 if(!res.ok)
@@ -285,18 +303,15 @@ onOpenChange(false);
 
 router.refresh();
 
-},1200);
+},1000);
 
 
 
-}catch(err){
-
-console.error(err);
+}catch{
 
 setError(
-"Failed to create event"
+"Failed creating event"
 );
-
 
 }
 finally{
@@ -310,6 +325,8 @@ setCreating(false);
 
 
 
+
+
 return (
 
 <Dialog
@@ -317,41 +334,86 @@ open={open}
 onOpenChange={onOpenChange}
 >
 
-<DialogContent className="max-w-xl">
+
+<DialogContent
+className="
+max-w-lg
+rounded-2xl
+max-h-[85vh]
+overflow-hidden
+"
+>
 
 
 <DialogHeader>
 
-<DialogTitle className="flex items-center gap-2">
 
-<Calendar className="h-5 w-5"/>
+<DialogTitle
+className="
+flex
+items-center
+gap-2
+"
+>
+
+<Calendar
+className="h-5 w-5"
+/>
+
 
 Schedule Meeting
 
+
 </DialogTitle>
+
 
 </DialogHeader>
 
 
 
-<div className="space-y-5">
+
+<div
+className="
+space-y-4
+overflow-y-auto
+max-h-[65vh]
+pr-2
+"
+>
 
 
 
-<Card>
 
-<CardContent className="p-4">
 
-<p className="font-medium">
 
-{email.subject || "Email"}
+<Card
+className="
+bg-muted/40
+border-none
+"
+>
+
+<CardContent
+className="
+p-4
+"
+>
+
+
+<p className="font-medium text-sm">
+
+{email.subject}
 
 </p>
 
 
-<p className="text-sm text-muted-foreground">
+<p className="
+text-xs
+text-muted-foreground
+mt-1
+">
 
-AI extracts meeting details automatically.
+AI will find the best time.
 
 </p>
 
@@ -364,11 +426,20 @@ AI extracts meeting details automatically.
 
 
 
+
+
+
 {error && (
 
-<div className="flex gap-2 text-sm text-destructive">
+<div className="
+flex gap-2
+text-sm
+text-destructive
+">
 
-<AlertCircle className="h-4 w-4"/>
+<AlertCircle
+className="h-4 w-4"
+/>
 
 {error}
 
@@ -380,13 +451,265 @@ AI extracts meeting details automatically.
 
 
 
-{created && (
+{created ? (
 
-<div className="flex gap-2 text-sm">
+<div
+className="
+flex
+items-center
+gap-2
+text-sm
+text-green-600
+py-4
+"
+>
 
-<CheckCircle className="h-4 w-4"/>
+<CheckCircle
+className="h-4 w-4"
+/>
 
-Added to Google Calendar
+Event added to calendar
+
+</div>
+
+
+) : (
+
+<>
+
+
+{!meeting && (
+
+<Button
+
+className="w-full"
+
+onClick={extractMeeting}
+
+disabled={loading}
+
+>
+
+{
+loading
+
+?
+
+<>
+
+<Loader2
+className="
+h-4
+w-4
+mr-2
+animate-spin
+"
+/>
+
+Analyzing
+
+</>
+
+
+:
+
+<>
+
+<Sparkles
+className="
+h-4
+w-4
+mr-2
+"
+/>
+
+Analyze Email
+
+</>
+
+}
+
+</Button>
+
+)}
+
+
+
+
+
+{meeting && (
+
+<div className="space-y-4">
+
+
+<div>
+
+<p className="
+font-medium
+text-sm
+">
+
+{meeting.title}
+
+</p>
+
+
+<p className="
+text-xs
+text-muted-foreground
+">
+
+{meeting.date}
+
+</p>
+
+
+</div>
+
+
+
+
+
+<div className="space-y-2">
+
+<label className="text-sm">
+Date
+</label>
+
+
+<Input
+
+type="date"
+
+value={date}
+
+onChange={
+(e)=>setDate(e.target.value)
+}
+
+/>
+
+
+</div>
+
+
+
+
+
+<Button
+
+variant="outline"
+
+className="w-full"
+
+onClick={findSlots}
+
+disabled={checking}
+
+>
+
+
+{
+checking
+
+?
+
+"Finding slots..."
+
+:
+
+"Find Free Slots"
+
+}
+
+
+</Button>
+
+
+
+
+
+
+
+{slots.length > 0 && (
+
+<div className="space-y-2">
+
+
+<p className="
+text-sm
+font-medium
+flex
+items-center
+gap-2
+">
+
+<Clock
+className="h-4 w-4"
+/>
+
+Available slots
+
+</p>
+
+
+
+
+
+<div className="grid gap-2">
+
+
+{
+slots.slice(0,6).map((slot)=>(
+
+
+<button
+
+key={slot.start}
+
+onClick={()=>setSelected(slot)}
+
+className={`
+
+rounded-xl
+border
+p-3
+text-left
+transition
+
+${
+selected?.start === slot.start
+
+?
+
+"border-primary bg-primary/10"
+
+:
+
+"hover:bg-muted"
+
+}
+
+`}
+
+>
+
+
+{slot.start}
+-
+{slot.end}
+
+
+</button>
+
+
+))
+
+}
+
+
+
+</div>
 
 </div>
 
@@ -398,270 +721,54 @@ Added to Google Calendar
 
 
 
-{
-!meeting && !created && (
-
 <Button
+
 className="w-full"
-onClick={extractMeeting}
-disabled={loading}
->
 
-{
-loading ?
-
-<>
-
-<Loader2 className="mr-2 h-4 w-4 animate-spin"/>
-
-Analyzing
-
-</>
-
-:
-
-<>
-
-<Sparkles className="mr-2 h-4 w-4"/>
-
-Extract Meeting
-
-</>
-
+disabled={
+!selected ||
+creating
 }
 
-</Button>
-
-)
-}
-
-
-
-
-
-
-
-{
-meeting && !created && (
-
-
-<Card>
-
-<CardContent className="p-4 space-y-5">
-
-
-
-<div>
-
-<p className="text-sm text-muted-foreground">
-
-Title
-
-</p>
-
-<p className="font-medium">
-
-{meeting.title || "Meeting"}
-
-</p>
-
-</div>
-
-
-
-
-
-
-<div className="space-y-3">
-
-
-<div>
-
-<label className="text-sm">
-Date
-</label>
-
-<Input
-type="date"
-value={date}
-onChange={(e)=>setDate(e.target.value)}
-/>
-
-</div>
-
-
-
-
-
-<div className="grid grid-cols-2 gap-3">
-
-
-<div>
-
-<label className="text-sm">
-Start
-</label>
-
-<Input
-type="time"
-value={startTime}
-onChange={(e)=>setStartTime(e.target.value)}
-/>
-
-</div>
-
-
-
-<div>
-
-<label className="text-sm">
-End
-</label>
-
-<Input
-type="time"
-value={endTime}
-onChange={(e)=>setEndTime(e.target.value)}
-/>
-
-</div>
-
-
-</div>
-
-
-
-<Button
-variant="outline"
-onClick={checkAvailability}
-disabled={checking}
->
-
-{
-checking
-?
-"Checking..."
-:
-"Find Available Slots"
-}
-
-</Button>
-
-
-
-</div>
-
-
-
-
-
-
-{
-slots.length>0 && (
-
-<div className="space-y-2">
-
-<p className="text-sm font-medium">
-Available slots
-</p>
-
-
-<div className="grid grid-cols-2 gap-2">
-
-
-{
-slots.map((slot)=>(
-<Button
-key={slot.start}
-variant="secondary"
-onClick={()=>{
-
-setStartTime(slot.start);
-setEndTime(slot.end);
-
-}}
->
-
-{slot.start}
--
-{slot.end}
-
-</Button>
-))
-
-}
-
-
-</div>
-
-</div>
-
-)
-}
-
-
-
-
-
-
-
-<div className="flex justify-end gap-2">
-
-
-<Button
-variant="outline"
-onClick={()=>setMeeting(null)}
->
-
-Re-analyze
-
-</Button>
-
-
-
-<Button
 onClick={createEvent}
-disabled={creating}
+
 >
 
+
 {
-creating ?
+creating
 
-<>
+?
 
-<Loader2 className="mr-2 h-4 w-4 animate-spin"/>
-
-Creating
-
-</>
+"Creating..."
 
 :
 
-"Create Event"
+"Create Calendar Event"
 
 }
+
 
 </Button>
 
 
-</div>
-
-
-
-
-</CardContent>
-
-</Card>
-
-)
-
-}
-
-
-
 
 
 </div>
+
+)}
+
+
+
+</>
+
+)}
+
+
+
+
+</div>
+
 
 
 </DialogContent>

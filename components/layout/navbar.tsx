@@ -4,70 +4,268 @@ import {
   Mail,
   Calendar,
   Command,
+  Sparkles,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import ThemeToggle from "@/components/ThemeToggle";
+
 
 export function Navbar() {
-  return (
-    <header className="sticky top-0 z-30 h-16 border-b bg-background/80 backdrop-blur">
-      <div className="flex h-full items-center justify-between px-6">
 
-        {/* LEFT */}
-        <div>
 
-          <h1 className="text-lg font-semibold">
-            OneClick
-          </h1>
+return (
 
-          <p className="text-xs text-muted-foreground">
-            AI Executive Assistant
-          </p>
+<header
+className="
+sticky
+top-0
+z-30
+h-14
+border-b
+bg-background/80
+backdrop-blur
+"
+>
 
-        </div>
 
-        {/* RIGHT */}
-        <div className="flex items-center gap-3">
+<div
+className="
+h-full
+flex
+items-center
+justify-between
+px-6
+"
+>
 
-          {/* COMMAND SHORTCUT */}
-          <div className="hidden md:flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs text-muted-foreground">
 
-            <Command className="h-3.5 w-3.5" />
 
-            <span>Command Center</span>
+{/* LEFT */}
 
-            <kbd className="rounded border px-1.5 py-0.5 text-[10px]">
-              ⌘K
-            </kbd>
+<div className="
+flex
+items-center
+gap-3
+">
 
-          </div>
 
-          {/* GMAIL */}
-          <Badge
-            variant="secondary"
-            className="gap-2"
-          >
-            <Mail className="h-3 w-3" />
-            Gmail
-          </Badge>
+<div className="
+h-8
+w-8
+rounded-lg
+border
+flex
+items-center
+justify-center
+bg-muted
+">
 
-          {/* CALENDAR */}
-          <Badge
-            variant="secondary"
-            className="gap-2"
-          >
-            <Calendar className="h-3 w-3" />
-            Calendar
-          </Badge>
 
-          {/* USER */}
-          <div className="flex h-9 w-9 items-center justify-center rounded-full border text-sm font-medium">
-            T
-          </div>
+<Sparkles
+className="h-4 w-4"
+/>
 
-        </div>
 
-      </div>
-    </header>
-  );
+</div>
+
+
+
+<div>
+
+<h1 className="
+text-sm
+font-semibold
+">
+
+OneClick
+
+</h1>
+
+
+<p className="
+text-[11px]
+text-muted-foreground
+">
+
+AI Assistant
+
+</p>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+{/* RIGHT */}
+
+
+<div className="
+flex
+items-center
+gap-2
+">
+
+
+
+
+
+{/* COMMAND */}
+
+<div
+className="
+hidden
+lg:flex
+items-center
+gap-2
+rounded-lg
+border
+px-2.5
+py-1.5
+text-xs
+text-muted-foreground
+"
+>
+
+
+<Command
+className="h-3.5 w-3.5"
+/>
+
+
+<span>
+⌘ K
+</span>
+
+
+</div>
+
+
+
+
+
+
+
+
+{/* Gmail */}
+
+
+<Badge
+
+variant="secondary"
+
+className="
+hidden
+sm:flex
+gap-1.5
+text-xs
+"
+
+>
+
+
+<Mail
+className="h-3 w-3"
+/>
+
+
+Gmail
+
+
+</Badge>
+
+
+
+
+
+
+
+{/* Calendar */}
+
+
+<Badge
+
+variant="secondary"
+
+className="
+hidden
+sm:flex
+gap-1.5
+text-xs
+"
+
+>
+
+
+<Calendar
+className="h-3 w-3"
+/>
+
+
+Calendar
+
+
+</Badge>
+
+
+
+
+
+
+{/* Theme */}
+
+
+<ThemeToggle />
+
+
+
+
+
+
+{/* User */}
+
+<div
+className="
+h-8
+w-8
+rounded-full
+border
+flex
+items-center
+justify-center
+text-xs
+font-medium
+"
+>
+
+T
+
+</div>
+
+
+
+
+</div>
+
+
+
+
+
+
+</div>
+
+
+</header>
+
+
+)
+
 }

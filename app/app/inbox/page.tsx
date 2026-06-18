@@ -4,115 +4,329 @@ import { ActionDashboard } from "@/components/action-dashboard";
 import { ChatBox } from "@/components/chat/chat-box";
 
 import {
-  Card,
-  CardContent,
+ Card,
+ CardContent,
 } from "@/components/ui/card";
 
-async function getInbox() {
-  const res = await fetch(
-    "http://localhost:3000/api/inbox",
-    {
-      cache: "no-store",
-    }
-  );
+import {
+ Mail,
+ Clock,
+ Sparkles,
+ CheckCircle,
+} from "lucide-react";
 
-  return res.json();
+
+
+async function getInbox(){
+
+const res =
+await fetch(
+"http://localhost:3000/api/inbox",
+{
+cache:"no-store"
+}
+);
+
+
+if(!res.ok)
+throw new Error();
+
+
+return res.json();
+
 }
 
-export default async function InboxPage() {
-  const inbox = await getInbox();
 
-  return (
-    <main className="max-w-5xl mx-auto p-8">
-      <div className="mb-10">
-        <h1 className="text-4xl font-bold">
-          Smart Inbox
-        </h1>
 
-        <p className="text-muted-foreground mt-2">
-          AI-powered email triage and
-          prioritization.
-        </p>
-      </div>
 
-      <div className="mb-10">
-        <SyncStatusCard />
-        </div>
+export default async function InboxPage(){
 
-      {/* Stats Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-sm text-muted-foreground">
-              Pending
-            </p>
 
-            <p className="text-2xl font-bold">
-              {inbox.actionRequired.length}
-            </p>
-          </CardContent>
-        </Card>
+const inbox =
+await getInbox();
 
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-sm text-muted-foreground">
-              Replied
-            </p>
 
-            <p className="text-2xl font-bold">
-              {inbox.replied?.length ?? 0}
-            </p>
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-sm text-muted-foreground">
-              Newsletters
-            </p>
+return (
 
-            <p className="text-2xl font-bold">
-              {inbox.newsletter.length}
-            </p>
-          </CardContent>
-        </Card>
+<main className="
+max-w-6xl
+mx-auto
+p-5
+space-y-5
+">
 
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-sm text-muted-foreground">
-              Others
-            </p>
 
-            <p className="text-2xl font-bold">
-              {inbox.others?.length ?? 0}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-      
-      <ActionDashboard
-       emails={inbox.actionRequired}
-       />
 
-      <InboxSection
-         title="✅ Replied"
-          items={inbox.replied}
-        />
+{/* TOP BAR */}
 
-      <InboxSection
-        title="🔥 High Priority"
-        items={inbox.highPriority}
-      />
+<div className="
+flex
+gap-3
+items-center
+">
 
-      <InboxSection
-        title="📩 Newsletters"
-        items={inbox.newsletter}
-      />
 
-      <InboxSection
-        title="📬 Others"
-        items={inbox.others}
-      />
-    </main>
-  );
+{/* SMALL COMMAND */}
+
+<Card className="
+flex-1
+">
+
+<CardContent className="
+p-2
+">
+
+<ChatBox/>
+
+</CardContent>
+
+</Card>
+
+
+
+
+{/* SYNC */}
+
+<div className="
+shrink-0
+">
+
+<SyncStatusCard/>
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+{/* SMALL STATS */}
+
+
+<div className="
+grid
+grid-cols-2
+md:grid-cols-4
+gap-3
+">
+
+
+
+<StatCard
+
+icon={<Clock/>}
+
+title="Pending"
+
+value={
+inbox.actionRequired.length
+}
+
+/>
+
+
+
+<StatCard
+
+icon={<CheckCircle/>}
+
+title="Replied"
+
+value={
+inbox.replied?.length ?? 0
+}
+
+/>
+
+
+
+<StatCard
+
+icon={<Mail/>}
+
+title="News"
+
+value={
+inbox.newsletter.length
+}
+
+/>
+
+
+
+<StatCard
+
+icon={<Sparkles/>}
+
+title="Priority"
+
+value={
+inbox.highPriority.length
+}
+
+/>
+
+
+
+</div>
+
+
+
+
+
+
+{/* ACTION CENTER */}
+
+<ActionDashboard
+
+emails={
+inbox.actionRequired
+}
+
+/>
+
+
+
+
+
+
+<div className="
+space-y-4
+">
+
+
+<InboxSection
+
+title="🔥 Priority"
+
+items={
+inbox.highPriority
+}
+
+/>
+
+
+
+<InboxSection
+
+title="✅ Replied"
+
+items={
+inbox.replied
+}
+
+/>
+
+
+
+<InboxSection
+
+title="📩 News"
+
+items={
+inbox.newsletter
+}
+
+/>
+
+
+
+<InboxSection
+
+title="📬 Others"
+
+items={
+inbox.others
+}
+
+
+/>
+
+
+</div>
+
+
+
+
+
+</main>
+
+)
+
+}
+
+
+
+
+
+
+
+function StatCard({
+icon,
+title,
+value
+}:any){
+
+
+return (
+
+<Card>
+
+<CardContent className="
+p-3
+flex
+items-center
+justify-between
+">
+
+
+<div>
+
+
+<p className="
+text-xs
+text-muted-foreground
+">
+
+{title}
+
+</p>
+
+
+
+<p className="
+text-xl
+font-semibold
+">
+
+{value}
+
+</p>
+
+
+</div>
+
+
+<div className="
+h-4
+w-4
+">
+
+{icon}
+
+</div>
+
+
+
+</CardContent>
+
+</Card>
+
+)
+
 }
