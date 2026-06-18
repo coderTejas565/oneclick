@@ -1,8 +1,12 @@
 import { corsair } from "@/corsair";
 import { processEmail } from "./processEmail";
 
-export async function processInbox() {
-  const result = await corsair.gmail.api.messages.list({
+export async function processInbox(
+  userId: string
+) {
+    const tenant =
+    corsair.withTenant(userId);
+  const result = await tenant.gmail.api.messages.list({
     maxResults: 2,
   });
 
@@ -14,7 +18,10 @@ export async function processInbox() {
     if (!message.id) continue;
 
     try {
-      const processed = await processEmail(message.id);
+      const processed = await processEmail(
+  userId,
+  message.id
+);
 
       // DB row already contains everything needed
       if (!processed?.id) continue;

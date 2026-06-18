@@ -1,7 +1,10 @@
-import { corsair } from "@/corsair"
+import { corsair } from "@/corsair";
 
-export async function fetchEmails() {
-  const emails = await corsair.gmail.db.messages.list();
+export async function fetchEmails(
+  userId: string
+) {
+  const tenant =
+    corsair.withTenant(userId);
 
-  return emails;
+  return tenant.gmail.db.messages.list();
 }

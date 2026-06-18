@@ -43,6 +43,27 @@
       "when": 1781760250197,
       "tag": "0005_far_multiple_man",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1781770225521,
+      "tag": "0006_ancient_red_wolf",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1781778267529,
+      "tag": "0007_blushing_toro",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1781783362445,
+      "tag": "0008_safe_christian_walker",
+      "breakpoints": true
     }
   ]
 }

@@ -2,22 +2,31 @@ import { db } from "@/db/db";
 import { syncState } from "@/db/sync-state.schema";
 import { eq } from "drizzle-orm";
 
-const SYNC_ID = "gmail";
 
-export async function getSyncState() {
+export async function getSyncState(
+  userId: string
+) {
   const result = await db
     .select()
     .from(syncState)
-    .where(eq(syncState.id, SYNC_ID));
+    .where(
+      eq(
+        syncState.userId,
+        userId
+      )
+    );
 
   return result[0] ?? null;
 }
 
-export async function createSyncState() {
+export async function createSyncState(
+  userId: string
+) {
   const result = await db
     .insert(syncState)
     .values({
-      id: SYNC_ID,
+      id: crypto.randomUUID(),
+      userId,
       status: "idle",
     })
     .returning();
@@ -26,6 +35,7 @@ export async function createSyncState() {
 }
 
 export async function updateSyncState(
+  userId: string,
   data: Partial<
     typeof syncState.$inferInsert
   >
@@ -36,18 +46,27 @@ export async function updateSyncState(
       ...data,
       updatedAt: new Date(),
     })
-    .where(eq(syncState.id, SYNC_ID))
+    .where(
+      eq(
+        syncState.userId,
+        userId
+      )
+    )
     .returning();
 
   return result[0];
 }
 
 
-export async function ensureSyncState() {
+export async function ensureSyncState(
+  userId: string
+) {
   const existing =
-    await getSyncState();
+    await getSyncState(userId);
 
-  if (existing) return existing;
+  if (existing) {
+    return existing;
+  }
 
-  return createSyncState();
+  return createSyncState(userId);
 }

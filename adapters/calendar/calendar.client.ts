@@ -1,27 +1,45 @@
 import { corsair } from "@/corsair";
 
+
 export const calendarClient = {
-  async createEvent({
-    title,
-    start,
-    end,
-  }: {
-    title: string;
-    start: string;
-    end: string;
-  }) {
-    return corsair.googlecalendar.api.events.create({
-      event: {
-        summary: title,
 
-        start: {
-          dateTime: start,
-        },
+ async createEvent(
+ {
+   userId,
+   title,
+   start,
+   end,
+ }:{
+   userId:string;
+   title:string;
+   start:string;
+   end:string;
+ }
+ ){
 
-        end: {
-          dateTime: end,
-        },
-      },
-    });
-  },
-};
+ const tenant =
+   corsair.withTenant(userId);
+
+
+ return tenant.googlecalendar.api.events.create({
+
+   event:{
+
+    summary:title,
+
+    start:{
+      dateTime:start,
+    },
+
+    end:{
+      dateTime:end,
+    }
+
+   }
+
+ });
+
+
+ }
+
+}

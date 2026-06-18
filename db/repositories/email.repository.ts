@@ -1,12 +1,20 @@
 import { db } from "@/db/db";
 import { emails } from "@/db/email-schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc,and } from "drizzle-orm";
 
-export async function getEmailById(id: string) {
+export async function getEmailById(
+  userId: string,
+  emailId: string
+) {
   const result = await db
     .select()
     .from(emails)
-    .where(eq(emails.id, id));
+    .where(
+      and(
+        eq(emails.userId, userId),
+        eq(emails.id, emailId)
+      )
+    );
 
   return result[0] ?? null;
 }
@@ -22,9 +30,19 @@ export async function saveEmail(
   return result[0];
 }
 
-export async function getAllEmails() {
+export async function getAllEmails(
+  userId: string
+) {
   return db
     .select()
     .from(emails)
-    .orderBy(desc(emails.processedAt));
+    .where(
+      eq(
+        emails.userId,
+        userId
+      )
+    )
+    .orderBy(
+      desc(emails.processedAt)
+    );
 }

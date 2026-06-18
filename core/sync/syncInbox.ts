@@ -6,17 +6,25 @@ import {
   updateSyncState,
 } from "@/db/repositories/sync.repository";
 
-export async function syncInbox() {
-  // Make sure sync_state row exists
-  await ensureSyncState();
+export async function syncInbox(
+  userId: string
+) {
 
-  await updateSyncState({
-    status: "running",
-  });
+    const tenant =
+    corsair.withTenant(userId);
+  // Make sure sync_state row exists
+await ensureSyncState(userId);
+
+await updateSyncState(
+  userId,
+  {
+    status:"running"
+  }
+);
 
   try {
     const result =
-      await corsair.gmail.api.messages.list({
+      await tenant.gmail.api.messages.list({
         maxResults: 20,
       });
 
@@ -29,7 +37,7 @@ export async function syncInbox() {
       if (!msg.id) continue;
 
       try {
-        await processEmail(msg.id);
+        await processEmail(userId,msg.id);
         processed++;
       } catch (err) {
         console.error(
@@ -40,7 +48,7 @@ export async function syncInbox() {
       }
     }
 
-    await updateSyncState({
+    await updateSyncState(userId,{
       status: "idle",
       lastSyncedAt: new Date(),
       nextPageToken:
@@ -52,7 +60,7 @@ export async function syncInbox() {
       processed,
     };
   } catch (error) {
-    await updateSyncState({
+    await updateSyncState(userId,{
       status: "failed",
       lastSyncedAt: new Date(),
     });

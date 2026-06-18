@@ -9,18 +9,23 @@ import {
   saveEmail,
 } from "@/db/repositories/email.repository";
 
-export async function processEmail(emailId: string) {
+export async function processEmail(userId: string,emailId: string) {
   try {
     // 1. DB FIRST (FAST PATH)
-    const existingEmail = await getEmailById(emailId);
+    const existingEmail = await getEmailById(
+      userId,
+      emailId
+    );
 
     if (existingEmail) {
       return existingEmail;
     }
 
+    const tenant =
+    corsair.withTenant(userId);
     // 2. FETCH FROM GMAIL (CORRECT CORSAIR USAGE)
     const rawEmail =
-      await corsair.gmail.api.messages.get({
+      await tenant.gmail.api.messages.get({
         id: emailId,
       });
 
@@ -46,23 +51,47 @@ export async function processEmail(emailId: string) {
     }
 
     // 6. SAVE TO DB (NO gmailId — USE id ONLY)
-const savedEmail = await saveEmail({
+const savedEmail =
+await saveEmail({
+
+  userId,
+
   id: emailId,
 
-  threadId: normalized.threadId,
-  from: normalized.from,
-  to: normalized.to,
+  threadId:
+    normalized.threadId,
 
-  subject: normalized.subject,
-  snippet: normalized.snippet,
-  body: normalized.body,
+  from:
+    normalized.from,
 
-  category: analysis.category,
-  priority: analysis.priority,
-  summary: analysis.summary,
-  actionRequired: analysis.actionRequired,
+  to:
+    normalized.to,
 
-  status: analysis.actionRequired ? EMAIL_STATUS.PENDING : EMAIL_STATUS.DONE,
+  subject:
+    normalized.subject,
+
+  snippet:
+    normalized.snippet,
+
+  body:
+    normalized.body,
+
+  category:
+    analysis.category,
+
+  priority:
+    analysis.priority,
+
+  summary:
+    analysis.summary,
+
+  actionRequired:
+    analysis.actionRequired,
+
+  status:
+    analysis.actionRequired
+      ? EMAIL_STATUS.PENDING
+      : EMAIL_STATUS.DONE,
 });
 
     return savedEmail;

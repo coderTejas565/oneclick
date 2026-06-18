@@ -1,4 +1,4 @@
-import { corsair } from "@/corsair";
+import { getTenant } from "@/core/corsair/get-tenant"
 
 function buildRawEmail({
   to,
@@ -26,19 +26,31 @@ function buildRawEmail({
 
 export const gmailClient = {
   async sendReply({
+    userId,
     messageId,
     threadId,
     to,
     subject,
     body,
-  }: any) {
+  }: {
+    userId: string;
+    messageId?: string;
+    threadId: string;
+    to: string;
+    subject: string;
+    body: string;
+  }) {
+
     const raw = buildRawEmail({
       to,
       subject,
       body,
     });
 
-    return corsair.gmail.api.messages.send({
+    const tenant =
+      getTenant(userId);
+
+    return tenant.gmail.api.messages.send({
       raw,
       threadId,
     });
