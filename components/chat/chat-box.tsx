@@ -250,6 +250,35 @@ message:text
 }
 );
 
+if(!res.ok){
+
+ const error =
+ await res.json();
+
+
+ setMessages(prev=>{
+
+ const copy=[...prev];
+
+ copy[
+ copy.length-1
+ ] =
+ {
+  role:"assistant",
+  content:
+  error.message ??
+  "AI is unavailable right now."
+ };
+
+ return copy;
+
+ });
+
+
+ return;
+
+}
+
 
 
 

@@ -1,92 +1,207 @@
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
+
 import { db } from "@/db/db";
 import { emails } from "@/db/email-schema";
 import { eq } from "drizzle-orm";
 
 import { sendReply } from "@/core/email/sendReply";
 import { EMAIL_STATUS } from "@/constants/email-status";
+import { auth } from "@/lib/auth";
+
 
 export async function POST(req: Request) {
   try {
+
+    const session =
+      await auth.api.getSession({
+        headers: await headers(),
+      });
+
+
+    if (!session) {
+      return NextResponse.json(
+        {
+          success:false,
+          error:"Unauthorized",
+        },
+        {
+          status:401,
+        }
+      );
+    }
+
+
+    const userId =
+      session.user.id;
+
+
+
     const {
       emailId,
       subject,
       body,
     } = await req.json();
 
+
+
     if (!emailId || !subject || !body) {
       return NextResponse.json(
         {
-          success: false,
-          error: "Missing required fields",
+          success:false,
+          error:"Missing required fields",
         },
-        { status: 400 }
+        {
+          status:400,
+        }
       );
     }
 
-    // 1. Fetch email from DB
-    const emailResult = await db
+
+
+    // user scoped query
+    const emailResult =
+      await db
       .select()
       .from(emails)
-      .where(eq(emails.id, emailId))
+      .where(
+        eq(emails.id,emailId)
+      )
       .limit(1);
 
-    const email = emailResult[0];
 
-    if (!email) {
+
+    const email =
+      emailResult[0];
+
+
+
+    if(!email){
+
       return NextResponse.json(
         {
-          success: false,
-          error: "Missing threadId",
+          success:false,
+          error:"Email not found",
         },
-        { status: 400 }
+        {
+          status:404
+        }
       );
+
     }
 
-    if (email.replied) {
-        return NextResponse.json(
-            {
-                success: false,
-                error: "Email already replied",
-            },
-            { status: 400 }
-        );
+
+
+    if(email.userId !== userId){
+
+      return NextResponse.json(
+        {
+          success:false,
+          error:"Forbidden",
+        },
+        {
+          status:403
+        }
+      );
+
     }
 
-    // 2. Send reply via Gmail adapter
-    const result = await sendReply({
-      messageId: email.id,
-      threadId: email.threadId!,
-      to: email.from,
+
+
+    if(email.replied){
+
+      return NextResponse.json(
+        {
+          success:false,
+          error:"Email already replied",
+        },
+        {
+          status:400
+        }
+      );
+
+    }
+
+
+
+const result =
+  await sendReply(
+    userId,
+    {
+      messageId:
+        email.id,
+
+      threadId:
+        email.threadId ?? "",
+
+      to:
+        email.to,
+
       subject,
-      body,
-    });
 
-    // 3. Update DB state
+      body,
+    }
+  );
+
+
+
+
+
     await db
       .update(emails)
       .set({
-        replied: true,
-        repliedAt: new Date(),
-        status: EMAIL_STATUS.REPLIED
-      })
-      .where(eq(emails.id, emailId));
 
-    // 4. Return success
+        replied:true,
+
+        repliedAt:
+          new Date(),
+
+        status:
+          EMAIL_STATUS.REPLIED,
+
+      })
+      .where(
+        eq(
+          emails.id,
+          emailId
+        )
+      );
+
+
+
+
+
     return NextResponse.json({
-      success: true,
-      message: "Reply sent successfully",
-      data: result,
+
+      success:true,
+
+      message:
+        "Reply sent successfully",
+
+      data:
+        result,
+
     });
-  } catch (error) {
-    console.error("Reply API Error:", error);
+
+
+
+  } catch(error){
+
+    console.error(
+      "Reply API Error:",
+      error
+    );
+
 
     return NextResponse.json(
       {
-        success: false,
-        error: "Failed to send reply",
+        success:false,
+        error:"Failed to send reply",
       },
-      { status: 500 }
+      {
+        status:500
+      }
     );
+
   }
 }

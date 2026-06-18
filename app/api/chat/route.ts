@@ -4,6 +4,7 @@ import { run } from "@openai/agents";
 import {
   detectAction
 } from "@/core/agent/action-detector";
+import { NextResponse } from "next/server";
 
 
 export async function POST(
@@ -11,7 +12,24 @@ export async function POST(
 ) {
 
 
+  
+if (!process.env.OPENAI_API_KEY) {
+
+    return NextResponse.json(
+      {
+        success:false,
+        message:
+        "AI assistant is currently unavailable. Configure API key."
+      },
+      {
+        status:503
+      }
+    );
+
+  }
+  
 try {
+
 
 
 const {
