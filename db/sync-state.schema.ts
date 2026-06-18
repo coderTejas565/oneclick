@@ -2,48 +2,75 @@ import {
   pgTable,
   text,
   timestamp,
-  index
+  index,
+  unique
 } from "drizzle-orm/pg-core";
+
 
 export const syncState = pgTable(
   "sync_state",
   {
-    id: text("id").primaryKey(),
 
-    userId: text("user_id").notNull(),
+    id: text("id")
+      .primaryKey(),
+
+
+    userId: text("user_id")
+      .notNull(),
+
 
     nextPageToken: text(
       "next_page_token"
     ),
 
+
     status: text("status")
       .notNull()
       .default("idle"),
 
+
     lastSyncedAt: timestamp(
       "last_synced_at",
       {
-        withTimezone: true,
+        withTimezone:true,
       }
     ),
+
 
     createdAt: timestamp(
       "created_at",
       {
-        withTimezone: true,
+        withTimezone:true,
       }
-    ).defaultNow(),
+    )
+    .defaultNow(),
+
 
     updatedAt: timestamp(
       "updated_at",
       {
-        withTimezone: true,
+        withTimezone:true,
       }
-    ).defaultNow(),
+    )
+    .defaultNow(),
+
   },
-   (table) => ({
-    userIdx: index(
-      "sync_user_idx"
-    ).on(table.userId),
+
+
+  (table)=>({
+
+    userIdx:
+      index(
+        "sync_user_idx"
+      )
+      .on(table.userId),
+
+
+    userUnique:
+      unique(
+        "sync_user_unique"
+      )
+      .on(table.userId),
+
   })
 );

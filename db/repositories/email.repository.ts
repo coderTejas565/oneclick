@@ -31,18 +31,18 @@ export async function saveEmail(
 }
 
 export async function getAllEmails(
-  userId: string
-) {
-  return db
-    .select()
-    .from(emails)
-    .where(
-      eq(
-        emails.userId,
-        userId
-      )
-    )
-    .orderBy(
-      desc(emails.processedAt)
-    );
+ userId:string
+){
+ return db
+ .select()
+ .from(emails)
+ .where(
+  eq(
+   emails.userId,
+   userId
+  )
+ )
+ .orderBy(
+   desc(emails.processedAt)
+ );
 }

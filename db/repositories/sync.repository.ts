@@ -20,18 +20,24 @@ export async function getSyncState(
 }
 
 export async function createSyncState(
-  userId: string
+ userId:string
 ) {
-  const result = await db
-    .insert(syncState)
-    .values({
-      id: crypto.randomUUID(),
-      userId,
-      status: "idle",
-    })
-    .returning();
 
-  return result[0];
+ const result =
+ await db
+ .insert(syncState)
+ .values({
+   id:crypto.randomUUID(),
+   userId,
+   status:"idle",
+ })
+ .onConflictDoNothing()
+ .returning();
+
+
+ return result[0] ?? 
+   await getSyncState(userId);
+
 }
 
 export async function updateSyncState(

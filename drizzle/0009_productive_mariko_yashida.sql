@@ -1,0 +1,1 @@
+ALTER TABLE "sync_state" ADD CONSTRAINT "sync_user_unique" UNIQUE("user_id");
