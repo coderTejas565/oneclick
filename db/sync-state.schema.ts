@@ -2,12 +2,15 @@ import {
   pgTable,
   text,
   timestamp,
+  index
 } from "drizzle-orm/pg-core";
 
 export const syncState = pgTable(
   "sync_state",
   {
     id: text("id").primaryKey(),
+
+    userId: text("user_id").notNull(),
 
     nextPageToken: text(
       "next_page_token"
@@ -37,5 +40,10 @@ export const syncState = pgTable(
         withTimezone: true,
       }
     ).defaultNow(),
-  }
+  },
+   (table) => ({
+    userIdx: index(
+      "sync_user_idx"
+    ).on(table.userId),
+  })
 );

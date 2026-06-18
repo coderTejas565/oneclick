@@ -3,10 +3,13 @@ import {
   text,
   boolean,
   timestamp,
+  index
 } from "drizzle-orm/pg-core";
 
 export const emails = pgTable("emails", {
   id: text("id").primaryKey(),
+
+  userId:text("user_id").notNull(),
 
   threadId: text("thread_id"),
 
@@ -46,4 +49,16 @@ export const emails = pgTable("emails", {
       withTimezone: true,
     }
   ).defaultNow(),
-});
+
+},
+(table) => ({
+  userIdx: index("emails_user_idx")
+    .on(table.userId),
+
+  threadIdx: index("emails_thread_idx")
+    .on(table.threadId),
+
+  statusIdx: index("emails_status_idx")
+    .on(table.status),
+})
+);
