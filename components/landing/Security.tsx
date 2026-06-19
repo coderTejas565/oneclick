@@ -36,7 +36,7 @@ export default function Security() {
   ]
 
   return (
-    <section className="relative py-32 px-6 overflow-hidden bg-background">
+    <section id="security" className="relative py-32 px-6 overflow-hidden bg-background">
 
       {/* ambient */}
       <motion.div

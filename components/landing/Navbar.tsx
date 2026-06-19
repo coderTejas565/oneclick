@@ -3,6 +3,10 @@
 import { Button } from "@/components/ui/button"
 import ThemeToggle from "../ThemeToggle"
 
+import Features from "./Features"
+import Workflow from "./Workflow"
+import Security from "./Security"
+
 import {
   motion,
   useMotionValueEvent,
@@ -11,7 +15,7 @@ import {
 
 import { useState } from "react"
 import { Sparkles } from "lucide-react"
-
+import Link from "next/link"
 
 
 export default function Navbar(){
@@ -19,6 +23,16 @@ export default function Navbar(){
 const {scrollY}=useScroll()
 
 const [scrolled,setScrolled]=useState(false)
+
+function handleScroll(
+  id: string
+){
+  document
+    .getElementById(id)
+    ?.scrollIntoView({
+      behavior:"smooth"
+    });
+}
 
 
 useMotionValueEvent(
@@ -240,65 +254,42 @@ OneClick
 {/* nav links */}
 
 
-
 {
 
 !scrolled && (
 
 <div className="
-
 hidden
-
 md:flex
-
 items-center
-
 gap-8
-
-
 text-sm
-
 text-muted-foreground
-
 ">
 
 
-{
-
-["Features","Workflow","Security"].map((item)=>(
-
-
-<motion.span
-
-key={item}
-
-whileHover={{
-
-y:-2
-
-}}
-
-className="
-
-cursor-pointer
-
-hover:text-foreground
-
-transition
-
-"
-
+<button
+onClick={()=>handleScroll("features")}
+className="hover:text-foreground"
 >
-
-{item}
-
-</motion.span>
+Features
+</button>
 
 
-))
+<button
+onClick={()=>handleScroll("workflow")}
+className="hover:text-foreground"
+>
+Workflow
+</button>
 
-}
 
+<button
+onClick={()=>handleScroll("security")}
+className="hover:text-foreground"
+>
+Security
+</button>
 
 
 </div>
@@ -306,6 +297,8 @@ transition
 )
 
 }
+
+
 
 
 
@@ -330,7 +323,7 @@ gap-3
 
 
 
-
+<Link href="/app/signup">
 
 <Button
 
@@ -366,22 +359,23 @@ shadow-lg
 
 
 {
-
-scrolled
-
-?
-
-"Start"
-
-:
-
-"Connect"
-
+    
+    scrolled
+    
+    ?
+    
+    "Start"
+    
+    :
+    
+    "Connect"
+    
 }
 
 
 </Button>
 
+    </Link>
 
 
 

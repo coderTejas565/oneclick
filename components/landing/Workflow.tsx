@@ -47,7 +47,7 @@ export default function Workflow(){
 
 return (
 
-<section
+<section id="workflow"
 
 className="
 py-32

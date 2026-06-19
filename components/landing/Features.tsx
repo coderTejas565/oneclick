@@ -20,7 +20,7 @@ export default function Features(){
 
 return (
 
-<section
+<section  id="features"
 
 className="
 relative
