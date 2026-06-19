@@ -323,7 +323,7 @@ gap-3
 
 
 
-<Link href="/app/signup">
+<Link href="/signup">
 
 <Button
 
