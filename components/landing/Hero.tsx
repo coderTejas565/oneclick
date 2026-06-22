@@ -14,6 +14,8 @@ Brain,
 Zap
 } from "lucide-react"
 
+import Link from "next/link"
+
 
 
 export default function Hero(){
@@ -525,8 +527,9 @@ rounded-full
 bg-foreground/10
 
 blur-[180px]
-"
 
+pointer-events-none
+"
 />
 
 
@@ -592,8 +595,9 @@ flex
 items-center
 justify-center
 
-"
+pointer-events-none
 
+"
 >
 
 <Mail size={16}/>
@@ -614,6 +618,7 @@ justify-center
 
 <div className="
 relative
+z-50
 max-w-7xl
 w-full
 text-center
@@ -763,50 +768,38 @@ flex-wrap
 ">
 
 
+
 <Button
-
-size="lg"
-
-className="
-rounded-full
-px-9
-
-bg-foreground
-
-text-background
-
-hover:bg-foreground/90
-
-"
-
+  asChild
+  size="lg"
+  className="
+  rounded-full
+  px-9
+  bg-foreground
+  text-background
+  hover:bg-foreground/90
+  "
 >
-
-Connect Gmail
-
+  <Link href="/signup">
+    Connect Gmail
+  </Link>
 </Button>
 
 
-
-
 <Button
-
-size="lg"
-
-variant="outline"
-
-className="
-rounded-full
-px-9
-glass
-"
-
+  asChild
+  size="lg"
+  variant="outline"
+  className="
+  rounded-full
+  px-9
+  glass
+  "
 >
-
-View demo
-
+  <Link href="/login">
+    View Demo
+  </Link>
 </Button>
-
-
 </div>
 
 

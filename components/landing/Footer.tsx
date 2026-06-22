@@ -9,6 +9,8 @@ Sparkles,
 CheckCircle2
 } from "lucide-react"
 
+import Link from "next/link"
+
 
 
 export default function Footer(){
@@ -309,6 +311,7 @@ flex-wrap
 
 >
 
+<Link href="/signup">
 
 <Button
 
@@ -345,6 +348,7 @@ className="ml-2"
 
 </Button>
 
+</Link>
 
 </div>
 

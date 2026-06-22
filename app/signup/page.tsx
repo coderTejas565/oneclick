@@ -8,6 +8,10 @@ import { authClient } from "@/lib/auth-client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+import { Card, CardContent } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+
 export default function SignupPage() {
   const router = useRouter();
 
@@ -55,69 +59,154 @@ export default function SignupPage() {
     }
   }
 
-  return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+ return (
+  <div className="min-h-screen p-4">
+  <div
+    className="
+    relative
+    flex
+    min-h-[calc(100vh-2rem)]
+    flex-col
+    rounded-[32px]
+    border
+    border-border
+    bg-background
+    "
+  >
 
-      <div className="w-full max-w-md space-y-6">
 
-        <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold">
-            Create Account
-          </h1>
+    {/* Center */}
 
-          <p className="text-muted-foreground">
-            Start using OneClick
-          </p>
-        </div>
+    <div
+      className="
+      flex-1
+      flex
+      items-center
+      justify-center
+      px-6
+      "
+    >
 
-        <div className="space-y-4">
+      <Card
+        className="
+        w-full
+        max-w-md
+        border-border/80
+        bg-card
+        shadow-none
+        "
+      >
+        <CardContent className="p-8">
 
-          <Input
-            placeholder="Name"
-            value={name}
-            onChange={(e) =>
-              setName(e.target.value)
-            }
-          />
+          <div className="space-y-2">
 
-          <Input
-            placeholder="Email"
-            type="email"
-            value={email}
-            onChange={(e) =>
-              setEmail(e.target.value)
-            }
-          />
+            <h2
+              className="
+              text-4xl
+              font-bold
+              tracking-tight
+              "
+            >
+              Create workspace
+            </h2>
 
-          <Input
-            placeholder="Password"
-            type="password"
-            value={password}
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
-          />
-
-          {error && (
-            <p className="text-sm text-red-500">
-              {error}
+            <p className="text-muted-foreground">
+              Start using OneClick today.
             </p>
-          )}
 
-          <Button
-            className="w-full"
-            onClick={handleSignup}
-            disabled={loading}
-          >
-            {loading
-              ? "Creating..."
-              : "Create Account"}
-          </Button>
+          </div>
 
-        </div>
+          <div className="mt-8 space-y-5">
 
-      </div>
+            <div className="space-y-2">
+              <Label>Full Name</Label>
+
+              <Input
+                value={name}
+                onChange={(e) =>
+                  setName(e.target.value)
+                }
+                placeholder="Tejas A."
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Email</Label>
+
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) =>
+                  setEmail(e.target.value)
+                }
+                placeholder="tejas@gmail.com"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Password</Label>
+
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) =>
+                  setPassword(e.target.value)
+                }
+                placeholder="••••••••"
+              />
+            </div>
+
+            {error && (
+              <p className="text-sm text-red-500">
+                {error}
+              </p>
+            )}
+
+            <Button
+              onClick={handleSignup}
+              disabled={loading}
+              className="
+              h-11
+              w-full
+              rounded-xl
+              "
+            >
+              {loading
+                ? "Creating..."
+                : "Create Workspace"}
+            </Button>
+
+            <p
+              className="
+              text-center
+              text-sm
+              text-muted-foreground
+              "
+            >
+              Already have an account?
+              <button
+                onClick={() =>
+                  router.push("/login")
+                }
+                className="
+                ml-1
+                text-foreground
+                "
+              >
+                Sign in
+              </button>
+            </p>
+
+          </div>
+
+        </CardContent>
+      </Card>
 
     </div>
-  );
+
+  </div>
+</div>
+ 
+);
+
 }
